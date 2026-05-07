@@ -19,7 +19,7 @@ ________________________________________________________________________________
 - `libbcu` (core library interface)
   - `libbcu/libbcu.h`: exported library status definitions
   - Core implementation sources: `port.c`, `chip.c`, `board.c`, `bcu_parser.c`, `bcu_yaml.c`, `bcu_ftdi_eeprom.c`
-  - `libbcu` build targets disable direct printing and return status to caller
+  - `libbcu` build targets disable direct printing; status-code propagation is provided as interface direction via `libbcu/libbcu.h`
 - `bcu.c`
   - terminal app implementation responsible for user-facing output/printing
 

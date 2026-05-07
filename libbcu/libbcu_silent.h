@@ -7,12 +7,14 @@
 #ifdef LIBBCU_NO_PRINT
 static inline int bcu_log_printf(const char* fmt, ...)
 {
+	/* No-print mode: preserve call sites, always return 0. */
 	(void)fmt;
 	return 0;
 }
 
 static inline int bcu_log_fprintf(FILE* stream, const char* fmt, ...)
 {
+	/* No-print mode: preserve call sites, always return 0. */
 	(void)stream;
 	(void)fmt;
 	return 0;
