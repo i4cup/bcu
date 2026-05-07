@@ -151,7 +151,7 @@ int ft_open_channel(struct ftdi_info* fi, int channel)
 	else
 	{
 		status = -1;
-		BCU_PRINTF("open channel can only range from 0 to 4");
+		BCU_PRINTF("open channel can only range from 0 to 4\n");
 
 	}
 	fi->FT_set_timeouts(fi->ftdi, 300, 300);

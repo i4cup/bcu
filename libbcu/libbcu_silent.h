@@ -1,53 +1,14 @@
 #ifndef LIBBCU_SILENT_H
 #define LIBBCU_SILENT_H
 
-#include <stdarg.h>
 #include <stdio.h>
 
 #ifdef LIBBCU_NO_PRINT
-static inline int bcu_log_printf(const char* fmt, ...)
-{
-	va_list args;
-	/* No-print mode: preserve call sites, always return 0. */
-	va_start(args, fmt);
-	va_end(args);
-	(void)fmt;
-	return 0;
-}
-
-static inline int bcu_log_fprintf(FILE* stream, const char* fmt, ...)
-{
-	va_list args;
-	/* No-print mode: preserve call sites, always return 0. */
-	va_start(args, fmt);
-	va_end(args);
-	(void)stream;
-	(void)fmt;
-	return 0;
-}
+#define BCU_PRINTF(...) ((int)0)
+#define BCU_FPRINTF(...) ((int)0)
 #else
-static inline int bcu_log_printf(const char* fmt, ...)
-{
-	va_list args;
-	int ret;
-	va_start(args, fmt);
-	ret = vprintf(fmt, args);
-	va_end(args);
-	return ret;
-}
-
-static inline int bcu_log_fprintf(FILE* stream, const char* fmt, ...)
-{
-	va_list args;
-	int ret;
-	va_start(args, fmt);
-	ret = vfprintf(stream, fmt, args);
-	va_end(args);
-	return ret;
-}
+#define BCU_PRINTF(...) printf(__VA_ARGS__)
+#define BCU_FPRINTF(...) fprintf(__VA_ARGS__)
 #endif
-
-#define BCU_PRINTF(...) bcu_log_printf(__VA_ARGS__)
-#define BCU_FPRINTF(...) bcu_log_fprintf(__VA_ARGS__)
 
 #endif
