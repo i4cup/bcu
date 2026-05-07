@@ -5,7 +5,10 @@
 extern "C" {
 #endif
 
-int bcu_main(int argc, char** argv);
+typedef enum {
+	LIBBCU_OK = 0,
+	LIBBCU_ERR = -1,
+} libbcu_status_t;
 
 #ifdef __cplusplus
 }

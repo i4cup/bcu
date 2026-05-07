@@ -40,6 +40,7 @@
 #endif
 
 #include <stdio.h>
+#include "libbcu/libbcu_silent.h"
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>

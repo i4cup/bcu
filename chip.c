@@ -29,6 +29,7 @@
 *
 */
 #include<stdio.h>
+#include "libbcu/libbcu_silent.h"
 #include<stdlib.h>
 #include<string.h>
 #include<ctype.h>

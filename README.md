@@ -17,10 +17,11 @@ ________________________________________________________________________________
 # **Project structure (libbcu-oriented)**
 
 - `libbcu` (core library interface)
-  - `libbcu/libbcu.h`: exported library entry API
-  - Core implementation sources: `bcu.c`, `port.c`, `chip.c`, `board.c`, `bcu_parser.c`, `bcu_yaml.c`, `bcu_ftdi_eeprom.c`
-- `apps/cli`
-  - `apps/cli/main.c`: CLI wrapper that links against `libbcu`
+  - `libbcu/libbcu.h`: exported library status definitions
+  - Core implementation sources: `port.c`, `chip.c`, `board.c`, `bcu_parser.c`, `bcu_yaml.c`, `bcu_ftdi_eeprom.c`
+  - `libbcu` build targets disable direct printing and return status to caller
+- `bcu.c`
+  - terminal app implementation responsible for user-facing output/printing
 
 Release artifacts are organized by system/platform and software form:
 - Linux: `bcu` + `libbcu.so` + `libbcu.a`

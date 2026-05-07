@@ -16,8 +16,7 @@ pkg_check_modules(LIBFTDI REQUIRED libftdi1)
 pkg_check_modules(LIBYAML REQUIRED yaml-0.1)
 pkg_check_modules(LIBUSB REQUIRED libusb-1.0)
 
-set(BCU_CORE_SOURCES
-        bcu.c
+set(LIBBCU_CORE_SOURCES
         port.c
         chip.c
         board.c
@@ -41,11 +40,13 @@ elseif (MACOS)
         execute_process(COMMAND sh ${PROJECT_SOURCE_DIR}/create_version_h.sh ${PROJECT_SOURCE_DIR})
 endif ()
 
-add_library(bcu_shared SHARED ${BCU_CORE_SOURCES})
+add_library(bcu_shared SHARED ${LIBBCU_CORE_SOURCES})
 set_target_properties(bcu_shared PROPERTIES OUTPUT_NAME bcu)
 
-add_library(bcu_static STATIC ${BCU_CORE_SOURCES})
+add_library(bcu_static STATIC ${LIBBCU_CORE_SOURCES})
 set_target_properties(bcu_static PROPERTIES OUTPUT_NAME bcu)
+target_compile_definitions(bcu_shared PRIVATE LIBBCU_NO_PRINT=1)
+target_compile_definitions(bcu_static PRIVATE LIBBCU_NO_PRINT=1)
 
 if (LINUX)
         target_link_libraries(bcu_shared ${LIBUSB_LIBRARIES} ${LIBFTDI_LIBRARIES} ${LIBYAML_LIBRARIES} -lpthread -lm -ldl)
@@ -56,11 +57,11 @@ elseif (MACOS)
 endif ()
 
 if (LINUX)
-        add_executable(bcu apps/cli/main.c)
+        add_executable(bcu bcu.c)
         target_link_libraries(bcu bcu_static)
         install(TARGETS bcu DESTINATION bin)
 elseif (MACOS)
-        add_executable(bcu_mac apps/cli/main.c)
+        add_executable(bcu_mac bcu.c)
         target_link_libraries(bcu_mac bcu_static)
         install(TARGETS bcu_mac DESTINATION bin)
 endif ()
