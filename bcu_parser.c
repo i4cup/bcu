@@ -57,14 +57,14 @@ int update_parameter_string(char* path, char* parameter_name, char* str)
 	char* ptr = strstr(path, parameter_name);
 	if (ptr == NULL)
 	{
-		printf("could not locate parameter %s\n", parameter_name);
+		BCU_PRINTF("could not locate parameter %s\n", parameter_name);
 		return -1;
 	}
 	char* equal_sign = strchr(ptr, '=');
 	char* brk = strpbrk(equal_sign, ";}");
 	if (equal_sign == NULL)
 	{
-		printf("can not understand the specification \n");
+		BCU_PRINTF("can not understand the specification \n");
 		return -1;
 	}
 	strcpy(tpath, brk);
@@ -88,7 +88,7 @@ int extract_parameter_string(char* chip_specification, char* parameter_name, cha
 	char* brk = strpbrk(equal_sign, ";}");
 	if (equal_sign == NULL)
 	{
-		printf("can not understand the specification \n");
+		BCU_PRINTF("can not understand the specification \n");
 		return -1;
 	}
 	int length = (int)(brk - equal_sign - 1);
@@ -135,7 +135,7 @@ void free_device_linkedlist_backward(struct device* ptr)
 		void* parent = ptr->parent;
 		if (parent == NULL) //if we have reached the end, the the device must be ftdi, so we must close and free the ftdidevice;
 		{
-			//printf("closing and freeing ftdi device\n");
+			//BCU_PRINTF("closing and freeing ftdi device\n");
 			struct device* ft = delete_this;
 			ft->free(ft);
 			return;
@@ -157,7 +157,7 @@ void free_device_linkedlist_forward(struct device* ptr)
 		void* parent = ptr->parent;
 		if (parent == NULL) //if the device has no parent, then the device must be ftdi, so we must close and free the ftdidevice;
 		{
-			// printf("closing and freeing ftdi device\n");
+			// BCU_PRINTF("closing and freeing ftdi device\n");
 			struct device* ft = delete_this;
 			ft->free(ft);
 		}
@@ -195,7 +195,7 @@ int get_chip_specification_by_chipname(char* path, char* chip_specification, cha
 
 void* build_device_linkedlist_forward(void** head, char* path)
 {
-	//printf("original path: %s\n", path );
+	//BCU_PRINTF("original path: %s\n", path );
 
 	char remaining_path[MAX_PATH_LENGTH];
 	char chip_name[MAX_CHIP_SPEC_LENGTH];
@@ -207,11 +207,11 @@ void* build_device_linkedlist_forward(void** head, char* path)
 	if (strlen(path) < MAX_PATH_LENGTH)
 		strcpy(remaining_path, path);
 	else {
-		printf("entered path exceeded maximum length of the buffer\n");
+		BCU_PRINTF("entered path exceeded maximum length of the buffer\n");
 		return NULL;
 	}
 	char* chip_specification = strtok(remaining_path, "/");
-	//printf("chip_specification: %s\n", chip_specification);
+	//BCU_PRINTF("chip_specification: %s\n", chip_specification);
 	int found = 0;
 	int is_head = 1;
 	while (chip_specification != NULL)
@@ -226,7 +226,7 @@ void* build_device_linkedlist_forward(void** head, char* path)
 				current = chip_list[i].create_funcptr(chip_specification, previous);
 				if (current == NULL)
 				{
-					printf("failed to create %s data structure\n", chip_name);
+					BCU_PRINTF("failed to create %s data structure\n", chip_name);
 					return NULL;
 				}
 				if (is_head)
@@ -244,16 +244,16 @@ void* build_device_linkedlist_forward(void** head, char* path)
 		}
 		if (!found)
 		{
-			printf("did not recognize chip '%s'\n", chip_name);
+			BCU_PRINTF("did not recognize chip '%s'\n", chip_name);
 			free_device_linkedlist_backward(current);
 			return NULL;
 		}
 		chip_specification = strtok(NULL, "/");
-		//printf("chip_specification: %s\n", chip_specification);
+		//BCU_PRINTF("chip_specification: %s\n", chip_specification);
 	}
 	if (current)
 		current->child = NULL;
-	//printf("finished\n");
+	//BCU_PRINTF("finished\n");
 	return current;
 }
 
@@ -308,26 +308,26 @@ int parse_board_id_options(int argc, char** argv, struct options_setting* settin
 	int argc_count;
 	for (argc_count = 2; argc_count < argc; argc_count++)
 	{
-		//printf("parsing %s\n", argv[argc_count]);
+		//BCU_PRINTF("parsing %s\n", argv[argc_count]);
 		char* begin = strchr(argv[argc_count], '=');
 		char* input = begin + 1;
 		if (strncmp(argv[argc_count], "-board=", 7) == 0 && strlen(argv[argc_count]) > 7)
 		{
 			strcpy(setting->board, input);
-			printf("board model is %s\n", setting->board);
+			BCU_PRINTF("board model is %s\n", setting->board);
 			// break;
 		}
 
 		if (strncmp(argv[argc_count], "-id=", 4) == 0 && strlen(argv[argc_count]) > 4)
 		{
 			strcpy(GV_LOCATION_ID, input);
-			// printf("location_id is %s\n", GV_LOCATION_ID);
+			// BCU_PRINTF("location_id is %s\n", GV_LOCATION_ID);
 		}
 
 		if (strcmp(argv[argc_count], "-auto") == 0)
 		{
 			setting->auto_find_board = 1;
-			printf("will auto find the board...\n");
+			BCU_PRINTF("will auto find the board...\n");
 		}
 	}
 
@@ -372,24 +372,24 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 
 	for (int i = 2; i < argc; i++)
 	{
-		//printf("parsing %s\n", argv[i]);
+		//BCU_PRINTF("parsing %s\n", argv[i]);
 		char* begin = strchr(argv[i], '=');
 		char* input = begin + 1;
 
 		if (strncmp(argv[i], "-path=", strlen("-path=")) == 0 && strlen(argv[i]) > strlen("-path="))
 		{
 			strcpy(setting->path, input);
-			printf("set customized path as: %s\n", setting->path);
+			BCU_PRINTF("set customized path as: %s\n", setting->path);
 		}
 		else if (strncmp(argv[i], "-id=", 4) == 0 && strlen(argv[i]) > 4)
 		{
 			strcpy(GV_LOCATION_ID, input);
-			printf("location_id is %s\n", GV_LOCATION_ID);
+			BCU_PRINTF("location_id is %s\n", GV_LOCATION_ID);
 		}
 		else if (strcmp(argv[i], "-auto") == 0)
 		{
 			setting->auto_find_board = 1;
-			// printf("will auto find the board...\n");
+			// BCU_PRINTF("will auto find the board...\n");
 		}
 		else if (strncmp(argv[i], "-boothex=", 9) == 0 && strlen(argv[i]) > 4)
 		{
@@ -402,37 +402,37 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 		else if (strncmp(argv[i], "-delay=", 7) == 0 && strlen(argv[i]) > 7)
 		{
 			setting->delay = atoi(input);
-			printf("delay is %d\n", setting->delay);
+			BCU_PRINTF("delay is %d\n", setting->delay);
 		}
 		else if (strncmp(argv[i], "-hold=", 6) == 0 && strlen(argv[i]) > 6)
 		{
 			setting->hold = atoi(input);
-			printf("hold is %d\n", setting->hold);
+			BCU_PRINTF("hold is %d\n", setting->hold);
 		}
 		else if (strcmp(argv[i], "high") == 0)
 		{
 			setting->output_state = 1;
-			printf("will set gpio high\n");
+			BCU_PRINTF("will set gpio high\n");
 		}
 		else if (strcmp(argv[i], "low") == 0)
 		{
 			setting->output_state = 0;
-			printf("will set gpio low\n");
+			BCU_PRINTF("will set gpio low\n");
 		}
 		else if (strcmp(argv[i], "-toggle") == 0)
 		{
 			setting->output_state = 2;
-			printf("toggle gpio\n");
+			BCU_PRINTF("toggle gpio\n");
 		}
 		else if (strcmp(argv[i], "1") == 0)
 		{
 			setting->output_state = 1;
-			printf("will set gpio high\n");
+			BCU_PRINTF("will set gpio high\n");
 		}
 		else if (strcmp(argv[i], "0") == 0)
 		{
 			setting->output_state = 0;
-			printf("will set gpio low\n");
+			BCU_PRINTF("will set gpio low\n");
 		}
 		else if (strncmp(argv[i], "-dump=", 6) == 0 && strlen(argv[i]) > 6)
 		{
@@ -453,13 +453,13 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 					strcat(setting->dumpname, ".csv");
 				}
 			}
-			printf("dump data into %s file\n", setting->dumpname);
+			BCU_PRINTF("dump data into %s file\n", setting->dumpname);
 		}
 		else if (strcmp(argv[i], "-dump") == 0)
 		{
 			setting->dump = 1;
 			setting->dumpname = strdup("monitor_record.csv");
-			printf("dump data into %s file\n", setting->dumpname);
+			BCU_PRINTF("dump data into %s file\n", setting->dumpname);
 		}
 		else if (strcmp(argv[i], "-pmt") == 0)
 		{
@@ -472,7 +472,7 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 			{
 				setting->dump = 1;
 				setting->dumpname = strdup("monitor_record.csv");
-				printf("dump data into %s file\n", setting->dumpname);
+				BCU_PRINTF("dump data into %s file\n", setting->dumpname);
 			}
 		}
 		else if (strncmp(argv[i], "-hz=", 4) == 0 && strlen(argv[i]) > 4)
@@ -529,28 +529,28 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 			setting->eeprom_function = PARSER_EEPROM_UPDATE_USER_SN;
 
 			setting->eeprom_usr_sn = atoi(input);
-			printf("eeprom user SN will be set to %d\n", setting->eeprom_usr_sn);
+			BCU_PRINTF("eeprom user SN will be set to %d\n", setting->eeprom_usr_sn);
 		}
 		else if (strncmp(argv[i], "-w_ftdi_sn=", 11) == 0 && strlen(argv[i]) > 11)
 		{
 			setting->eeprom_function = PARSER_EEPROM_UPDATE_FTDI_SN;
 			setting->eeprom_ftdi_sn = input;
-			printf("eeprom FTDI SN will be set to %d\n", setting->eeprom_ftdi_sn);
+			BCU_PRINTF("eeprom FTDI SN will be set to %d\n", setting->eeprom_ftdi_sn);
 		}
 		else if (strncmp(argv[i], "-sn=", 4) == 0 && strlen(argv[i]) > 4)
 		{
 			setting->eeprom_usr_sn = atoi(input);
-			printf("eeprom user SN will be set to %d\n", setting->eeprom_usr_sn);
+			BCU_PRINTF("eeprom user SN will be set to %d\n", setting->eeprom_usr_sn);
 		}
 		else if (strncmp(argv[i], "-brev=", 6) == 0 && strlen(argv[i]) > 6)
 		{
 			strcpy(setting->eeprom_board_rev, input);
-			printf("eeprom user board revision will be set to %s\n", setting->eeprom_board_rev);
+			BCU_PRINTF("eeprom user board revision will be set to %s\n", setting->eeprom_board_rev);
 		}
 		else if (strncmp(argv[i], "-srev=", 6) == 0 && strlen(argv[i]) > 6)
 		{
 			strcpy(setting->eeprom_soc_rev, input);
-			printf("eeprom user soc revision will be set to %s\n", setting->eeprom_soc_rev);
+			BCU_PRINTF("eeprom user soc revision will be set to %s\n", setting->eeprom_soc_rev);
 		}
 		else if (strcmp(argv[i], "-doc") == 0)
 		{
@@ -579,17 +579,17 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 		else if (strncmp(argv[i], "-ptc_temp=", 6) == 0 && strlen(argv[i]) > 6)
 		{
 			setting->ptc_temp = atoi(input);
-			printf("CPU Current Temp is %f Celsius.\n", setting->ptc_temp);
+			BCU_PRINTF("CPU Current Temp is %f Celsius.\n", setting->ptc_temp);
 		}
 		else if (strncmp(argv[i], "-ptc_onoff=", 11) == 0)
 		{
 			setting->ptc_onoff = atoi(input);
-			printf("PTC is %d \n", setting->ptc_onoff);
+			BCU_PRINTF("PTC is %d \n", setting->ptc_onoff);
 		}
 		else if (strncmp(argv[i], "-ptc_sensor=", 12) == 0 && strlen(argv[i]) > 12)
 		{
 			setting->ptc_sensor = atoi(input);
-			printf("PTC sensor is set to %d\n", setting->ptc_sensor);
+			BCU_PRINTF("PTC sensor is set to %d\n", setting->ptc_sensor);
 		}
 		else if (strcmp(argv[i], "-autoranging") == 0)
 		{
@@ -644,7 +644,7 @@ int parse_options(char* cmd, int argc, char** argv, struct options_setting* sett
 			}
 			if (!found)
 			{
-				printf("could not recognize input %s\n", argv[i]);
+				BCU_PRINTF("could not recognize input %s\n", argv[i]);
 				return -1;
 			}
 		}
@@ -666,11 +666,11 @@ void* build_device_linkedlist_smart(void** new_head, char* new_path, void* old_h
 {
 	if (old_head == NULL || old_path == NULL)// first time building
 	{
-		//printf("building device linkedlist completely from scratch\n");
+		//BCU_PRINTF("building device linkedlist completely from scratch\n");
 		return build_device_linkedlist_forward(new_head, new_path);
 	}
 
-	//printf("attempting to partially rebuild device linked list \n");
+	//BCU_PRINTF("attempting to partially rebuild device linked list \n");
 	char new_remaining_path[MAX_PATH_LENGTH];
 	char old_remaining_path[MAX_PATH_LENGTH];
 	char chip_name[MAX_CHIP_SPEC_LENGTH];
@@ -726,21 +726,21 @@ void* build_device_linkedlist_smart(void** new_head, char* new_path, void* old_h
 	*/
 	if (index == 0)//case 0: they are different since the very beginning
 	{
-		//printf("completely different\n");
+		//BCU_PRINTF("completely different\n");
 		//free all and completely rebuild
 		free_device_linkedlist_forward(old_head);
 		return build_device_linkedlist_forward(new_head, new_path);
 	}
 	else if (new_chip_specifications[index] == NULL && old_chip_specifications[index] == NULL)//case 1: they are identical
 	{
-		//printf("same\n");
+		//BCU_PRINTF("same\n");
 		//no need to free anything
 		*new_head = old_head;
 		return previous;
 	}
 	else if (new_chip_specifications[index] != NULL && old_chip_specifications[index] != NULL)//case 2: they differ before any of them ends
 	{
-		//printf("different before end!\n");		
+		//BCU_PRINTF("different before end!\n");		
 		free_device_linkedlist_forward(current);//free everything since the first difference
 		*new_head = old_head;
 		current = NULL;
@@ -749,7 +749,7 @@ void* build_device_linkedlist_smart(void** new_head, char* new_path, void* old_h
 	}
 	else if (new_chip_specifications[index] == NULL && old_chip_specifications[index] != NULL)//case 3: the new one is a subset of old one
 	{
-		//printf("new shorter\n");		
+		//BCU_PRINTF("new shorter\n");		
 		free_device_linkedlist_forward(current);//free unwanted extra parts
 		*new_head = old_head;
 		return previous;
@@ -757,7 +757,7 @@ void* build_device_linkedlist_smart(void** new_head, char* new_path, void* old_h
 	}
 	else if (new_chip_specifications[index] != NULL && old_chip_specifications[index] == NULL)//case 4 the old one is a subset of new one
 	{
-		//printf("old shorter\n");		
+		//BCU_PRINTF("old shorter\n");		
 		//no need to free anything
 		*new_head = old_head;
 		//need reallocation in next step
@@ -776,7 +776,7 @@ void* build_device_linkedlist_smart(void** new_head, char* new_path, void* old_h
 				current = chip_list[i].create_funcptr(new_chip_specifications[index], previous);
 				if (current == NULL)
 				{
-					printf("failed to create %s data structure\n", chip_name);
+					BCU_PRINTF("failed to create %s data structure\n", chip_name);
 					return NULL;
 				}
 				current->child = NULL;
@@ -789,7 +789,7 @@ void* build_device_linkedlist_smart(void** new_head, char* new_path, void* old_h
 		}
 		if (!found)
 		{
-			printf("did not recognize chip '%s'\n", chip_name);
+			BCU_PRINTF("did not recognize chip '%s'\n", chip_name);
 			free_device_linkedlist_backward(current);
 			return NULL;
 		}
@@ -801,23 +801,23 @@ void* build_device_linkedlist_smart(void** new_head, char* new_path, void* old_h
 static int parse_group(int id, struct group* group_ptr, struct board_info* board)
 {
 	strcpy(group_ptr->name, board->power_groups[id].group_name);
-	// printf("group name: %s\n", group_ptr->name);
+	// BCU_PRINTF("group name: %s\n", group_ptr->name);
 
 	group_ptr->num_of_members = 0;
 	if (strlen(board->power_groups[id].group_string) < (MAX_MAPPING_NAME_LENGTH * MAX_NUMBER_OF_POWER))
 		strcpy(group_ptr->member_list, board->power_groups[id].group_string);
 	else
 	{
-		printf("entered group string exceeded maximum buffer size\n");
+		BCU_PRINTF("entered group string exceeded maximum buffer size\n");
 		return -1;
 	}
 	char group_member_string[MAX_MAPPING_NAME_LENGTH * MAX_NUMBER_OF_POWER];
 	strcpy(group_member_string, group_ptr->member_list);
-	// printf("group string: %s\n", group_member_string);
+	// BCU_PRINTF("group string: %s\n", group_member_string);
 	char* group_member_name = strtok(group_member_string, ",");
 	while (group_member_name != NULL)
 	{
-		// printf("member: %s\n", group_member_name);
+		// BCU_PRINTF("member: %s\n", group_member_name);
 		int power_index = 0;
 		int mapping_index = 0;
 		int found = 0;
@@ -858,7 +858,7 @@ int parse_groups(struct group* groups, struct board_info* board)
 
 	for (int i = 0; i < num_of_groups; i++) {
 		if (parse_group(i, &groups[i], board) == -1) {
-			printf("failed to understand the power groups setting\n");
+			BCU_PRINTF("failed to understand the power groups setting\n");
 			return -1;
 		}
 	}

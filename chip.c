@@ -72,7 +72,7 @@ void *ptc_revA_create(char *chip_specification, void *parent)
 
 	if (ptc == NULL)
 	{
-		printf("malloc failed\n");
+		BCU_PRINTF("malloc failed\n");
 		return NULL;
 	}
 	ptc->ptc_dev.device.parent = parent;
@@ -80,7 +80,7 @@ void *ptc_revA_create(char *chip_specification, void *parent)
 	ptc->ptc_dev.ptc_write = ptc_revA_write;
 	ptc->addr = extract_parameter_value(chip_specification, "addr");
 
-	printf("PTC was initialized!!!\n");
+	BCU_PRINTF("PTC was initialized!!!\n");
 	return ptc;
 }
 
@@ -98,7 +98,7 @@ float ptc_revA_read(void *ptc_revA, unsigned int register_addr)
 	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PTC);
 	if (status)
 	{
-		printf("oh no! no ack received!\n");
+		BCU_PRINTF("oh no! no ack received!\n");
 		return -10;
 	}
 	parent->i2c_write(parent, register_addr, I2C_TYPE_PTC);
@@ -124,7 +124,7 @@ float ptc_revA_write(void *ptc_revA, unsigned char *data_buffer, unsigned int re
 	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PTC);
 	if (status)
 	{
-		printf("oh no! no ack received!\n");
+		BCU_PRINTF("oh no! no ack received!\n");
 		return -10;
 	}
 	parent->i2c_write(parent, register_addr, I2C_TYPE_PTC);
@@ -142,15 +142,15 @@ void *pct2075_create(char *chip_specification, void *parent)
 
 	if (temp == NULL)
 	{
-		printf("malloc failed\n");
+		BCU_PRINTF("malloc failed\n");
 		return NULL;
 	}
 	temp->temp_dev.device.parent = parent;
 	temp->temp_dev.temp_read = temp_read;
 	temp->temp_dev.temp_enable = temp_enable;
 	temp->addr = extract_parameter_value(chip_specification, "addr");
-	// printf("AT24CXX created!\n");
-	printf("Temp was initialized!!!\n");
+	// BCU_PRINTF("AT24CXX created!\n");
+	BCU_PRINTF("Temp was initialized!!!\n");
 	return temp;
 }
 
@@ -168,7 +168,7 @@ float temp_read(void *pct2075)
 	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_TEMP);
 	if (status)
 	{
-		// printf("oh no! no ack received!\n");
+		// BCU_PRINTF("oh no! no ack received!\n");
 		return -10;
 	}
 	parent->i2c_write(parent, 0x00, I2C_TYPE_TEMP);
@@ -201,7 +201,7 @@ int temp_enable(void *pct2075, int enable)
 	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_TEMP);
 	if (status)
 	{
-		// printf("oh no! no ack received!\n");
+		// BCU_PRINTF("oh no! no ack received!\n");
 		return -10;
 	}
 	parent->i2c_write(parent, 0x01, I2C_TYPE_TEMP);
@@ -217,7 +217,7 @@ void* at24cxx_create(char* chip_specification, void* parent)
 	struct at24cxx* at24 = (struct at24cxx*)malloc(sizeof(struct at24cxx));
 	if (at24 == NULL)
 	{
-		printf("malloc failed\n");
+		BCU_PRINTF("malloc failed\n");
 		return NULL;
 	}
 	at24->eeprom_device.device.parent = parent;
@@ -227,7 +227,7 @@ void* at24cxx_create(char* chip_specification, void* parent)
 	at24->eeprom_device.eeprom_check_board = at24cxx_check_board;
 	at24->addr = extract_parameter_value(chip_specification, "addr");
 	at24->type = extract_parameter_value(chip_specification, "type");
-	//printf("AT24CXX created!\n");
+	//BCU_PRINTF("AT24CXX created!\n");
 	return at24;
 }
 
@@ -253,7 +253,7 @@ int at24cxx_read(void* at24cxx, unsigned char* data_buffer, unsigned int startad
 	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_AT24);
 	if (status)
 	{
-		// printf("oh no! no ack received!\n");
+		// BCU_PRINTF("oh no! no ack received!\n");
 		return -10;
 	}
 	if (at24->type == EEPROM_TYPE_AT24C32) {
@@ -290,7 +290,7 @@ int at24cxx_write(void* at24cxx, unsigned char* data_buffer, unsigned int starta
 	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_AT24);
 	if (status)
 	{
-		// printf("oh no! no ack received!\n");
+		// BCU_PRINTF("oh no! no ack received!\n");
 		return -10;
 	}
 	if (at24->type == EEPROM_TYPE_AT24C32)
@@ -329,7 +329,7 @@ int at24cxx_check_board(void* at24cxx)
 	if(parent->i2c_write(parent, addr_plus_write, I2C_TYPE_AT24))
 	{
 		parent->i2c_stop(parent);
-		// printf("pac 1934 failure get ack\n");
+		// BCU_PRINTF("pac 1934 failure get ack\n");
 		return -1;
 	}
 	else
@@ -345,7 +345,7 @@ void* pca9548_create(char* chip_specification, void* parent)
 	struct pca9548* pca = (struct pca9548*)malloc(sizeof(struct pca9548));
 	if (pca == NULL)
 	{
-		printf("malloc failed\n");
+		BCU_PRINTF("malloc failed\n");
 		return NULL;
 	}
 	pca->i2c_device.device.parent = parent;
@@ -357,7 +357,7 @@ void* pca9548_create(char* chip_specification, void* parent)
 	pca->channel = extract_parameter_value(chip_specification, "channel");
 	pca->addr = extract_parameter_value(chip_specification, "addr");
 	pca9548_set_channel(pca);
-	//printf("pca9548 created!\n");
+	//BCU_PRINTF("pca9548 created!\n");
 	return pca;
 }
 
@@ -414,7 +414,7 @@ int pca9548_set_channel(struct pca9548* pca9548)
 	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PCA9548);
 	if (status)
 	{
-		printf("oh no! no ack received!\n");
+		BCU_PRINTF("oh no! no ack received!\n");
 	}
 	parent->i2c_write(parent, change_channel_cmd, I2C_TYPE_PCA9548);
 	parent->i2c_stop(parent);
@@ -429,7 +429,7 @@ void* pca9847_create(char* chip_specification, void* parent)
 
 	if (pca == NULL)
 	{
-		printf("failed to create pca9847 struct ...\n");
+		BCU_PRINTF("failed to create pca9847 struct ...\n");
 		return NULL;
 	}
 	pca->i2c_device.device.parent = parent;
@@ -496,7 +496,7 @@ int pca9847_set_channel(struct pca9847* pca9847)
 	status = parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PCA9548);
 	if (status)
 	{
-		printf("oh no! no ack received!\n");
+		BCU_PRINTF("oh no! no ack received!\n");
 		return -10;
 	}
 	parent->i2c_write(parent, change_channel_cmd, I2C_TYPE_PCA9548);
@@ -526,7 +526,7 @@ void* ft4232h_eeprom_create(char* chip_specification, void* parent)
 	struct ft4232h_eeprom* ftee = malloc(sizeof(struct ft4232h_eeprom));
 	if (ftee == NULL)
 	{
-		printf("malloc failed\n");
+		BCU_PRINTF("malloc failed\n");
 		return NULL;
 	}
 
@@ -561,9 +561,9 @@ void* ft4232h_eeprom_create(char* chip_specification, void* parent)
 
 	if (status != 0)
 	{
-		printf("failed to open ftdi device, err = %d\n", status);
+		BCU_PRINTF("failed to open ftdi device, err = %d\n", status);
 #if defined(__linux__) || defined(__APPLE__)
-		printf("***please make sure you run bcu with sudo\n");
+		BCU_PRINTF("***please make sure you run bcu with sudo\n");
 #endif
 		free(ftee);
 		return NULL;
@@ -602,7 +602,7 @@ void* ft4232h_i2c_create(char* chip_specification, void* parent)
 	struct ft4232h* ft = malloc(sizeof(struct ft4232h));
 	if (ft == NULL)
 	{
-		printf("malloc failed\n");
+		BCU_PRINTF("malloc failed\n");
 		return NULL;
 	}
 	ft->i2c_device.device.parent = parent;
@@ -615,14 +615,14 @@ void* ft4232h_i2c_create(char* chip_specification, void* parent)
 	ft->channel = extract_parameter_value(chip_specification, "channel");
 	if (extract_parameter_value(chip_specification, "dir_bitmask") == -1)
 	{
-		printf("set dir_bitmask as default value 0x00\n");
+		BCU_PRINTF("set dir_bitmask as default value 0x00\n");
 		ft->dir_bitmask = 0x00;//default should be zero if parameter is not entered;
 	}
 	else
 		ft->dir_bitmask = extract_parameter_value(chip_specification, "dir_bitmask");
 	if (extract_parameter_value(chip_specification, "val_bitmask") == -1)
 	{
-		printf("set val_bitmask as default value 0x00\n");
+		BCU_PRINTF("set val_bitmask as default value 0x00\n");
 		ft->val_bitmask = 0x00;//default should be zero if parameter is not entered;
 	}
 	else
@@ -654,9 +654,9 @@ void* ft4232h_i2c_create(char* chip_specification, void* parent)
 
 			if (status != 0)
 			{
-				printf("failed to open ftdi device!\n");
+				BCU_PRINTF("failed to open ftdi device!\n");
 #if defined(__linux__) || defined(__APPLE__)
-				printf("***please make sure you run bcu with sudo\n");
+				BCU_PRINTF("***please make sure you run bcu with sudo\n");
 #endif		
 				free(ft);
 				return NULL;
@@ -665,7 +665,7 @@ void* ft4232h_i2c_create(char* chip_specification, void* parent)
 		ft4232h_i2c_init(ft);
 		ft->ftdi_info->isinit = 0x1;
 	}
-	//printf("ft4232h created!\n");
+	//BCU_PRINTF("ft4232h created!\n");
 	return ft;
 }
 
@@ -830,7 +830,7 @@ int ft4232h_i2c_write(void* ft4232h, unsigned char data, int type)
 
 	if (((in_buffer[0] & 0x1) != 0)) //Check ACK bit 0 on data byte read out
 	{
-		// printf("can't get the ACK bit after write\n");
+		// BCU_PRINTF("can't get the ACK bit after write\n");
 		return -1; /*Error, can't get the ACK bit */
 	}
 
@@ -946,7 +946,7 @@ int ft4232h_i2c_init(struct ft4232h* ft)
 		return ftStatus;
 	msleep(30); //Delay for a while
 
-	//printf("I2C initialization finished!\n");
+	//BCU_PRINTF("I2C initialization finished!\n");
 	return 0;
 }
 
@@ -973,7 +973,7 @@ void* ft4232h_gpio_create(char* chip_specification, void* parent)
 	struct ft4232h_gpio* ft = malloc(sizeof(struct ft4232h_gpio));
 	if (ft == NULL)
 	{
-		printf("malloc failed\n");
+		BCU_PRINTF("malloc failed\n");
 		return NULL;
 	}
 	ft->gpio_device.device.parent = parent;
@@ -998,9 +998,9 @@ void* ft4232h_gpio_create(char* chip_specification, void* parent)
 
 		if (status != 0)
 		{
-			printf("failed to open ftdi device!\n");
+			BCU_PRINTF("failed to open ftdi device!\n");
 #if defined(__linux__) || defined(__APPLE__)
-			printf("***please make sure you run bcu with sudo\n");
+			BCU_PRINTF("***please make sure you run bcu with sudo\n");
 #endif			
 
 			free(ft);
@@ -1024,18 +1024,18 @@ int ft4232h_gpio_write(void* ft4232h, unsigned char bit_value)
 	struct ft4232h_gpio* ft = ft4232h;
 	int mask = 0xFF;
 	if (ft_set_bitmode(ft->ftdi_info, mask, BM_BITBANG) < 0)
-		printf("failed to set bitmode\n");
+		BCU_PRINTF("failed to set bitmode\n");
 
 	unsigned char current_output;
 	ft_read_pins(ft->ftdi_info, &current_output);
-	//printf("previous output: %x\n", current_output);
+	//BCU_PRINTF("previous output: %x\n", current_output);
 
 	unsigned char data;
 	data = (current_output & (~ft->gpio_device.pin_bitmask)) | (bit_value & ft->gpio_device.pin_bitmask);
 
 	if (ft_write(ft->ftdi_info, &data, 1) < 0)
 	{
-		printf("failed to write\n");
+		BCU_PRINTF("failed to write\n");
 		return -1;
 	}
 
@@ -1057,7 +1057,7 @@ int ft4232h_gpio_read(void* ft4232h, unsigned char* bit_value_buffer)
 
 int ft4232h_gpio_toggle(void* ft4232h)
 {
-	printf("toggle is not yet implemented!\n");
+	BCU_PRINTF("toggle is not yet implemented!\n");
 	return 0;
 }
 
@@ -1075,7 +1075,7 @@ void* pac1934_create(char* chip_specification, void* parent)
 	struct pac1934* pac = (struct pac1934*)malloc(sizeof(struct pac1934));
 	if (pac == NULL)
 	{
-		printf("malloc failed\n");
+		BCU_PRINTF("malloc failed\n");
 		return NULL;
 	}
 	pac->power_device.device.parent = parent;
@@ -1101,7 +1101,7 @@ void* pac1934_create(char* chip_specification, void* parent)
 	pac->cur_group = pac->group;
 	pac->cur_sensor = pac->sensor;
 	pac->cur_rs = pac->rs1;
-	//printf("pac1934 created!\n");
+	//BCU_PRINTF("pac1934 created!\n");
 	return pac;
 }
 
@@ -1191,7 +1191,7 @@ int pac1934_write_bipolar(void* pac1934, int value)
 	parent->i2c_start(parent);
 	if(parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PAC1934))
 	{
-		printf("pac1934_write_bipolar: pac 1934 failure get ack, addr: 0x%x\n", pac->addr);
+		BCU_PRINTF("pac1934_write_bipolar: pac 1934 failure get ack, addr: 0x%x\n", pac->addr);
 		return -1;
 	};
 	parent->i2c_write(parent, PAC1934_REG_NEG_PWR_ADDR, I2C_TYPE_PAC1934);
@@ -1216,7 +1216,7 @@ int pac1934_write_no_skip(void* pac1934, int value)
 	parent->i2c_start(parent);
 	if(parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PAC1934))
 	{
-		printf("pac1934_write_no_skip: pac 1934 failure get ack, addr: 0x%x\n", pac->addr);
+		BCU_PRINTF("pac1934_write_no_skip: pac 1934 failure get ack, addr: 0x%x\n", pac->addr);
 		return -1;
 	};
 	parent->i2c_write(parent, PAC1934_REG_CHANNEL_DIS_AND_SMBUS_ADDR, I2C_TYPE_PAC1934);
@@ -1242,7 +1242,7 @@ int pac1934_snapshot(void* pac1934)
 	parent->i2c_start(parent);
 	if(parent->i2c_write(parent, addr_plus_write, I2C_TYPE_PAC1934))
 	{
-		printf("pac1934_snapshot: pac 1934 failure get ack, addr: 0x%x\n", pac->addr);
+		BCU_PRINTF("pac1934_snapshot: pac 1934 failure get ack, addr: 0x%x\n", pac->addr);
 		return -1;
 	};
 	parent->i2c_write(parent, 0x00, I2C_TYPE_PAC1934); //refresh;
@@ -1298,23 +1298,23 @@ int pac1934_get_data(void* pac1934, struct pac193x_reg_data* pac_reg)
 	parent->i2c_stop(parent);
 
 	// for(k=0; k<12; k++)
-	// 	printf("ctrl[%d]=0x%x\n", k, ctrl[k]);
+	// 	BCU_PRINTF("ctrl[%d]=0x%x\n", k, ctrl[k]);
 	// for(k=0; k<76; k++)
-	// 	printf("data[%d]=0x%x\n", k, data[k]);
+	// 	BCU_PRINTF("data[%d]=0x%x\n", k, data[k]);
 
-	// printf("voltage %d: %f\n", 1, ((double)(((data[0] << 8) + data[1]) * 32)) / (65535));
-	// printf("voltage %d: %f\n", 2, ((double)(((data[2] << 8) + data[3]) * 32)) / (65535));
-	// printf("voltage %d: %f\n", 3, ((double)(((data[4] << 8) + data[5]) * 32)) / (65535));
-	// printf("voltage %d: %f\n", 4, ((double)(((data[6] << 8) + data[7]) * 32)) / (65535));
+	// BCU_PRINTF("voltage %d: %f\n", 1, ((double)(((data[0] << 8) + data[1]) * 32)) / (65535));
+	// BCU_PRINTF("voltage %d: %f\n", 2, ((double)(((data[2] << 8) + data[3]) * 32)) / (65535));
+	// BCU_PRINTF("voltage %d: %f\n", 3, ((double)(((data[4] << 8) + data[5]) * 32)) / (65535));
+	// BCU_PRINTF("voltage %d: %f\n", 4, ((double)(((data[6] << 8) + data[7]) * 32)) / (65535));
 	pac_reg->vbus[0] = ((double)(((data[0] << 8) + data[1]) * 32)) / (65535);
 	pac_reg->vbus[1] = ((double)(((data[2] << 8) + data[3]) * 32)) / (65535);
 	pac_reg->vbus[2] = ((double)(((data[4] << 8) + data[5]) * 32)) / (65535);
 	pac_reg->vbus[3] = ((double)(((data[6] << 8) + data[7]) * 32)) / (65535);
 
-	// printf("current %d: %f\n", 1, (((double)(((data[8] << 8) + data[9]) * 1)) / (65535)) * 100000);
-	// printf("current %d: %f\n", 2, (((double)(((data[10] << 8) + data[11]) * 1)) / (65535)) * 100000);
-	// printf("current %d: %f\n", 3, (((double)(((data[12] << 8) + data[13]) * 1)) / (65535)) * 100000);
-	// printf("current %d: %f\n", 4, (((double)(((data[14] << 8) + data[15]) * 1)) / (65535)) * 100000);
+	// BCU_PRINTF("current %d: %f\n", 1, (((double)(((data[8] << 8) + data[9]) * 1)) / (65535)) * 100000);
+	// BCU_PRINTF("current %d: %f\n", 2, (((double)(((data[10] << 8) + data[11]) * 1)) / (65535)) * 100000);
+	// BCU_PRINTF("current %d: %f\n", 3, (((double)(((data[12] << 8) + data[13]) * 1)) / (65535)) * 100000);
+	// BCU_PRINTF("current %d: %f\n", 4, (((double)(((data[14] << 8) + data[15]) * 1)) / (65535)) * 100000);
 	pac_reg->vsense[0] = pac1934_reg2current((data[8] << 8) + data[9], pac->bipolar);
 	pac_reg->vsense[1] = pac1934_reg2current((data[10] << 8) + data[11], pac->bipolar);
 	pac_reg->vsense[2] = pac1934_reg2current((data[12] << 8) + data[13], pac->bipolar);
@@ -1330,7 +1330,7 @@ void* pca6408a_create(char* chip_specification, void* parent)
 	struct pca6408a* pca = (struct pca6408a*)malloc(sizeof(struct pca6408a));
 	if (pca == NULL)
 	{
-		printf("malloc failed\n");
+		BCU_PRINTF("malloc failed\n");
 		return NULL;
 	}
 	pca->gpio_device.device.parent = parent;
@@ -1592,7 +1592,7 @@ void* pca6416a_create(char* chip_specification, void* parent)
 	struct pca6416a* pca = (struct pca6416a*)malloc(sizeof(struct pca6416a));
 	if (pca == NULL)
 	{
-		printf("malloc failed\n");
+		BCU_PRINTF("malloc failed\n");
 		return NULL;
 	}
 	pca->gpio_device.device.parent = parent;
@@ -1862,7 +1862,7 @@ void* pcal9555a_create(char* chip_specification, void* parent)
 
 	if (pcal == NULL)
 	{
-		printf("failed to create pcal9555a struct ...\n");
+		BCU_PRINTF("failed to create pcal9555a struct ...\n");
 		return NULL;
 	}
 
@@ -2045,7 +2045,7 @@ void* pcal6524h_create(char* chip_specification, void* parent)
 	struct pcal6524h* pca = (struct pcal6524h*)malloc(sizeof(struct pcal6524h));
 	if (pca == NULL)
 	{
-		printf("malloc failed\n");
+		BCU_PRINTF("malloc failed\n");
 		return NULL;
 	}
 	pca->gpio_device.device.parent = parent;
@@ -2304,7 +2304,7 @@ void* adp5585_create(char* chip_specification, void* parent)
 	struct adp5585* adp = (struct adp5585*)malloc(sizeof(struct adp5585));
 	if (adp == NULL)
 	{
-		printf("malloc failed\n");
+		BCU_PRINTF("malloc failed\n");
 		return NULL;
 	}
 	adp->gpio_device.device.parent = parent;
@@ -2452,7 +2452,7 @@ int adp5585_set_direction(struct adp5585* adp, unsigned char value)
 
 int adp5585_toggle(void* adp5585)
 {
-	printf("adp5585_toggle: TBD\n");
+	BCU_PRINTF("adp5585_toggle: TBD\n");
 
 	return 0;
 }
@@ -2496,7 +2496,7 @@ void* pca9670_create(char* chip_specification, void* parent)
 	struct pca9670* pca = (struct pca9670*)malloc(sizeof(struct pca9670));
 	if (pca == NULL)
 	{
-		printf("malloc failed\n");
+		BCU_PRINTF("malloc failed\n");
 		return NULL;
 	}
 	pca->gpio_device.device.parent = parent;

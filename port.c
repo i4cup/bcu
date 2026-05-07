@@ -58,14 +58,14 @@ int ft_init(struct ftdi_info* ftdi)
 	HINSTANCE hGetProcIDDLL = LoadLibrary("ftd2xx.dll");
 
 	if (!hGetProcIDDLL) {
-		printf("loading process failed\n");
+		BCU_PRINTF("loading process failed\n");
 		return -1;
 	}
 	ftdi->FT_open = (pFT_open)GetProcAddress(hGetProcIDDLL, "FT_Open");
 	ftdi->FT_open_ex = (pFT_open_ex)GetProcAddress(hGetProcIDDLL, "FT_OpenEx");
 
 	if (!ftdi->FT_open) {
-		printf("ft_init: load failed\n");
+		BCU_PRINTF("ft_init: load failed\n");
 		return -1;
 	}
 	ftdi->FT_set_bitmode = (pFT_set_bitmode)GetProcAddress(hGetProcIDDLL, "FT_SetBitMode");
@@ -151,7 +151,7 @@ int ft_open_channel(struct ftdi_info* fi, int channel)
 	else
 	{
 		status = -1;
-		printf("open channel can only range from 0 to 4");
+		BCU_PRINTF("open channel can only range from 0 to 4");
 
 	}
 	fi->FT_set_timeouts(fi->ftdi, 300, 300);
@@ -168,7 +168,7 @@ int ft_open_channel(struct ftdi_info* fi, int channel)
 	int status=ftdi_set_interface(fi->ftdi, channel+1);
 	status=ftdi_usb_open_desc_index(fi->ftdi, VENDOR_ID, PRODUCT_ID,NULL,NULL, 0);
 	//status=ftdi_usb_open_bus_addr(ftdi->ftdi, 2,34);
-	//printf("ftdi open status:%d\n", status);
+	//BCU_PRINTF("ftdi open status:%d\n", status);
 	*/
 	int status = ft_open_channel_by_id(fi, channel, NULL);
 	if (!status)
@@ -182,24 +182,24 @@ int ft_close(struct ftdi_info* fi)
 	//ft_set_bitmode(fi, 0, 0); //resetting the controller. This will reset port C/D which is not desired.
 #ifdef _WIN32
 	int num = fi->FT_close(fi->ftdi);
-	//printf("%d\n",num);
+	//BCU_PRINTF("%d\n",num);
 	fi->isinit = 0;
 	return num;
 #else
 
 	if (fi->ftdi->usb_dev != NULL)
 		if (libusb_release_interface(fi->ftdi->usb_dev, fi->ftdi->interface) < 0)
-			printf("release interface failure\n");
+			BCU_PRINTF("release interface failure\n");
 
 #ifndef __APPLE__
 	if (fi->ftdi->usb_dev != NULL)
 		if (libusb_attach_kernel_driver(fi->ftdi->usb_dev, fi->ftdi->interface) < 0)
-			printf("failure attach kernel driver again\n");
+			BCU_PRINTF("failure attach kernel driver again\n");
 #endif
 
 	if (fi->ftdi->usb_dev != NULL)
                 if (libusb_kernel_driver_active(fi->ftdi->usb_dev, fi->ftdi->interface) < 0)
-                        printf("failure active kernel driver again\n");
+                        BCU_PRINTF("failure active kernel driver again\n");
 
 	ftdi_usb_close(fi->ftdi);
 	ftdi_free(fi->ftdi);
@@ -251,7 +251,7 @@ int ft_clear_buffer(struct ftdi_info* ftdi)
 #ifdef _WIN32
 	if (ftdi->FT_purge(ftdi->ftdi, PURGE_RX | PURGE_TX))
 	{
-		printf("clear buffer failed!\n");
+		BCU_PRINTF("clear buffer failed!\n");
 	}
 	return 0;
 #else
@@ -261,7 +261,7 @@ int ft_clear_buffer(struct ftdi_info* ftdi)
 	num2 = ftdi_usb_purge_tx_buffer(ftdi->ftdi);
 	if (num1 != 0 || num2 != 0)
 	{
-		printf("clear buffer failed!\n");
+		BCU_PRINTF("clear buffer failed!\n");
 	}
 	return 0;
 #endif
@@ -317,7 +317,7 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 
 	if (ftStatus != 0)
 	{
-		//printf("number of channel connected through FTDI device found: %d\n",numDevs);
+		//BCU_PRINTF("number of channel connected through FTDI device found: %d\n",numDevs);
 		return;
 	}
 	if (numDevs > 0)
@@ -328,15 +328,15 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 			if (ftStatus != 0)
 			{
 				return;
-				//printf("Dev %d:\n", i);
-				//printf("  Flags=0x%x\n",Flags);
-				//printf("  Type=0x%x\n",Type);
-				//printf("  ID=0x%x\n",ID);
-				//printf("loc_id=0x%x\n",loc_id);
-				//printf("board[%d] location_id=%x\n",i,loc_id);
-				//printf("  SerialNumber=%s\n",SerialNumber);
-				//printf("  Description=%s\n",Description);
-				//printf("  ftHandle=0x%x\n",ftHandleTemp);
+				//BCU_PRINTF("Dev %d:\n", i);
+				//BCU_PRINTF("  Flags=0x%x\n",Flags);
+				//BCU_PRINTF("  Type=0x%x\n",Type);
+				//BCU_PRINTF("  ID=0x%x\n",ID);
+				//BCU_PRINTF("loc_id=0x%x\n",loc_id);
+				//BCU_PRINTF("board[%d] location_id=%x\n",i,loc_id);
+				//BCU_PRINTF("  SerialNumber=%s\n",SerialNumber);
+				//BCU_PRINTF("  Description=%s\n",Description);
+				//BCU_PRINTF("  ftHandle=0x%x\n",ftHandleTemp);
 			}
 			int found = 0;
 			for (int k = 0; k < detected_boards; k++)
@@ -357,12 +357,12 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 					else if (strcmp("D", &Description[strlen(Description) - 1]) == 0)
 						board_table[k][3] = loc_id;
 					// else
-					// 	printf("detected channel information are not found!\n");
+					// 	BCU_PRINTF("detected channel information are not found!\n");
 				}
 			}
 			if (!found)
 			{
-				//printf("new board!\n");
+				//BCU_PRINTF("new board!\n");
 				board_table[detected_boards][4] = loc_id;
 				if (strcmp("A", &Description[strlen(Description) - 1]) == 0) {
 					board_table[detected_boards][0] = loc_id;
@@ -387,11 +387,11 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 					board_table[detected_boards][3] = loc_id;
 					detected_boards++;
 				} else
-					printf("detected channel information are not found!\n");
+					BCU_PRINTF("detected channel information are not found!\n");
 			}
 		}
 		if (mode == LIST_DEVICE_MODE_PRINT)
-			printf("number of boards connected through FTDI device found: %d\n", detected_boards);
+			BCU_PRINTF("number of boards connected through FTDI device found: %d\n", detected_boards);
 		else
 			*board_num = detected_boards;
 
@@ -435,17 +435,17 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 		for (int j = 0; j < detected_boards; j++)
 		{
 			if (mode == LIST_DEVICE_MODE_PRINT)
-				printf("board[%d] location_id=%s serial_no: %s product Desc: %s\n", j, location_id_str[j],
+				BCU_PRINTF("board[%d] location_id=%s serial_no: %s product Desc: %s\n", j, location_id_str[j],
 					board_serial[j][0] == '\0' ? "N/A" : board_serial[j],
 					board_description[j][0] == '\0' ? "N/A" : board_description[j]);
 			else
 				strcpy(location_str[j], location_id_str[j]);
-			//printf("id: %s\n", location_id_str[j]);
-			//printf("A: %x\n", board_table[j][0]);
-			//printf("B: %x\n", board_table[j][1]);
-			//printf("C: %x\n", board_table[j][2]);
-			//printf("D: %x\n", board_table[j][3]);
-			//printf("X: %x\n", board_table[j][4]);
+			//BCU_PRINTF("id: %s\n", location_id_str[j]);
+			//BCU_PRINTF("A: %x\n", board_table[j][0]);
+			//BCU_PRINTF("B: %x\n", board_table[j][1]);
+			//BCU_PRINTF("C: %x\n", board_table[j][2]);
+			//BCU_PRINTF("D: %x\n", board_table[j][3]);
+			//BCU_PRINTF("X: %x\n", board_table[j][4]);
 		}
 	}
 	return;
@@ -458,19 +458,19 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 
 	if ((ftdi = ftdi_new()) == 0)
 	{
-		fprintf(stderr, "ftdi_new failed\n");
+		BCU_FPRINTF(stderr, "ftdi_new failed\n");
 		//return -1;
 	}
 
 	if ((ret = ftdi_usb_find_all(ftdi, &devlist, 0, 0)) < 0)
 	{
-		fprintf(stderr, "ftdi_usb_find_all failed: %d (%s)\n", ret, ftdi_get_error_string(ftdi));
+		BCU_FPRINTF(stderr, "ftdi_usb_find_all failed: %d (%s)\n", ret, ftdi_get_error_string(ftdi));
 		retval = -1;
 		goto do_deinit;
 	}
 
 	if (mode == LIST_DEVICE_MODE_PRINT)
-		printf("number of boards connected through FTDI device found: %d\n", ret);
+		BCU_PRINTF("number of boards connected through FTDI device found: %d\n", ret);
 	else
 		*board_num = ret;
 
@@ -535,7 +535,7 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 		}
 
 		if (mode == LIST_DEVICE_MODE_PRINT)
-			printf("board[%d] location_id=%s serial_no: %s product Desc: %s\n", i, location_id[i],
+			BCU_PRINTF("board[%d] location_id=%s serial_no: %s product Desc: %s\n", i, location_id[i],
 				serial[0] == '\0' ? "N/A" : serial,
 				product[0] == '\0' ? "N/A" : product);
 		else
@@ -544,11 +544,11 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 		/*
 		if ((ret = ftdi_usb_get_strings(ftdi, curdev->dev, manufacturer, 128, description, 128, NULL, 0)) < 0)
 		{
-			fprintf(stderr, "ftdi_usb_get_strings failed: %d (%s)\n", ret, ftdi_get_error_string(ftdi));
+			BCU_FPRINTF(stderr, "ftdi_usb_get_strings failed: %d (%s)\n", ret, ftdi_get_error_string(ftdi));
 			retval = -1;
 			goto done;
 		}
-		printf("Manufacturer: %s, Description: %s\n\n", manufacturer, description);
+		BCU_PRINTF("Manufacturer: %s, Description: %s\n\n", manufacturer, description);
 		*/
 		curdev = curdev->next;
 	}
@@ -596,7 +596,7 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 
 	if (ftStatus != 0)
 	{
-		printf("failed to obtain device info list\n");
+		BCU_PRINTF("failed to obtain device info list\n");
 	}
 	if (numDevs > 0)
 	{
@@ -605,7 +605,7 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 			ftStatus = ft.FT_get_device_info_detail(i, &Flags, &Type, &ID, &loc_id, SerialNumber, Description, &ftHandleTemp);
 			if (ftStatus != 0)
 			{
-				printf("fail to get device information\n");
+				BCU_PRINTF("fail to get device information\n");
 				return -1;
 			}
 			int found = 0;
@@ -625,7 +625,7 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 					else if (strcmp("D", &Description[strlen(Description) - 1]) == 0)
 						board_table[k][3] = loc_id;
 					else
-						printf("detected channel information are not found!\n");
+						BCU_PRINTF("detected channel information are not found!\n");
 				}
 			}
 			if (!found)
@@ -647,7 +647,7 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 					board_table[detected_boards][3] = loc_id;
 				else
 				{
-					printf("detected channel information are not found!\n");
+					BCU_PRINTF("detected channel information are not found!\n");
 					continue;
 				}
 				detected_boards++;
@@ -673,7 +673,7 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 		if (strcmp(location_id_str[j], id) == 0)
 		{
 			int status;
-			//printf("opening channel %d",channel);
+			//BCU_PRINTF("opening channel %d",channel);
 
 			if (channel == 0)
 				status = fi->FT_open_ex((PVOID)board_table[j][0], OPEN_BY_LOCATION, &fi->ftdi);
@@ -688,7 +688,7 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 			else
 			{
 				status = -1;
-				printf("open channel can only range from 0 to 4\n");
+				BCU_PRINTF("open channel can only range from 0 to 4\n");
 			}
 
 			//status = fi->FT_open_ex(0x192, OPEN_BY_LOCATION, &fi->ftdi);
@@ -698,7 +698,7 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 		}
 	}
 
-	printf("entered location id can not be found\n");
+	BCU_PRINTF("entered location id can not be found\n");
 	return -1;
 
 #else
@@ -709,19 +709,19 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 	struct ftdi_device_list* devlist, * curdev;
 	if (fi->ftdi == NULL)
 	{
-		printf("ftdi_new failed!\n");
+		BCU_PRINTF("ftdi_new failed!\n");
 		return -1;
 	}
 
 	if ((number_of_ftdi = ftdi_usb_find_all(fi->ftdi, &devlist, 0, 0)) < 0)
 	{
-		printf("ftdi_usb_find_all failed!\n");
+		BCU_PRINTF("ftdi_usb_find_all failed!\n");
 		return -1;
 	}
 
 	if (number_of_ftdi == 0)
 	{
-		printf("no ftdi device found! please make sure the device is connnected to the computer\n");
+		BCU_PRINTF("no ftdi device found! please make sure the device is connnected to the computer\n");
 		ftdi_free(fi->ftdi);
 		ftdi_list_free(&devlist);
 		return -1;
@@ -757,7 +757,7 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 		}
 		if (id == NULL || strcmp(location_id[i], id) == 0)
 		{
-			// printf("found device specified\n");
+			// BCU_PRINTF("found device specified\n");
 			found = 1;
 			int status = ftdi_set_interface(fi->ftdi, channel);
 			status = ftdi_usb_open_dev(fi->ftdi, curdev->dev);
@@ -770,7 +770,7 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 	ftdi_list_free(&devlist);
 
 	if (!found) {
-		printf("entered location id not found\n");
+		BCU_PRINTF("entered location id not found\n");
 		ftdi_free(fi->ftdi);
 
 		return -1;
@@ -841,59 +841,59 @@ int ft_write_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned cha
 	f = ftdi_erase_eeprom(ftdic);
 	if (ftdi_set_eeprom_value(ftdic, MAX_POWER, 100) < 0)
 	{
-		fprintf(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
+		BCU_FPRINTF(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
 			f, ftdi_get_error_string(ftdic));
 	}
 
 	f = ftdi_erase_eeprom(ftdic);/* needed to determine EEPROM chip type */
 	if (ftdi_get_eeprom_value(ftdic, CHIP_TYPE, &value) < 0)
 	{
-		fprintf(stdout, "ftdi_get_eeprom_value: %d (%s)\n",
+		BCU_FPRINTF(stdout, "ftdi_get_eeprom_value: %d (%s)\n",
 			f, ftdi_get_error_string(ftdic));
 	}
 	if (value == -1)
-		fprintf(stdout, "No EEPROM\n");
+		BCU_FPRINTF(stdout, "No EEPROM\n");
 
 	if (ftdi_set_eeprom_value(ftdic, USER_DATA_ADDR, startaddr) < 0)
 	{
-		fprintf(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
+		BCU_FPRINTF(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
 			f, ftdi_get_error_string(ftdic));
 	}
 
 	if (ftdi_set_eeprom_value(ftdic, CHANNEL_A_DRIVER, DRIVER_VCP) < 0)
 	{
-		fprintf(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
+		BCU_FPRINTF(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
 			f, ftdi_get_error_string(ftdic));
 	}
 	
 	if (ftdi_set_eeprom_value(ftdic, CHANNEL_B_DRIVER, DRIVER_VCP) < 0)
 	{
-		fprintf(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
+		BCU_FPRINTF(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
 			f, ftdi_get_error_string(ftdic));
 	}
 
 	if (ftdi_set_eeprom_value(ftdic, CHANNEL_C_DRIVER, DRIVER_VCP) < 0)
 	{
-		fprintf(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
+		BCU_FPRINTF(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
 			f, ftdi_get_error_string(ftdic));
 	}
 
 	if (ftdi_set_eeprom_value(ftdic, CHANNEL_D_DRIVER, DRIVER_VCP) < 0)
 	{
-		fprintf(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
+		BCU_FPRINTF(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
 			f, ftdi_get_error_string(ftdic));
 	}
 
 	if (ftdi_set_eeprom_user_data(ftdic, buffer, size) < 0)
 	{
-		fprintf(stdout, "ftdi_get_eeprom_value: %d (%s)\n",
+		BCU_FPRINTF(stdout, "ftdi_get_eeprom_value: %d (%s)\n",
 			f, ftdi_get_error_string(ftdic));
 	}
 
 	f = ftdi_eeprom_build(ftdic);
 	if (f < 0)
 	{
-		fprintf(stdout, "Erase failed: %s",
+		BCU_FPRINTF(stdout, "Erase failed: %s",
 			ftdi_get_error_string(ftdic));
 		retval = -2;
 		return retval;
@@ -902,7 +902,7 @@ int ft_write_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned cha
 	f = ftdi_write_eeprom(ftdic);
 	if (f < 0)
 	{
-		fprintf(stdout, "ftdi_eeprom_decode: %d (%s)\n",
+		BCU_FPRINTF(stdout, "ftdi_eeprom_decode: %d (%s)\n",
 			f, ftdi_get_error_string(ftdic));
 		retval = 1;
 		return retval;
@@ -951,7 +951,7 @@ int ft_read_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned char
 	f = ftdi_read_eeprom(ftdic);
 	if (f < 0)
 	{
-		fprintf(stderr, "ftdi_read_eeprom: %d (%s)\n",
+		BCU_FPRINTF(stderr, "ftdi_read_eeprom: %d (%s)\n",
 				f, ftdi_get_error_string(ftdic));
 		return -1;
 	}
@@ -959,7 +959,7 @@ int ft_read_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned char
 	f = ftdi_eeprom_decode(ftdic, 0);
 	if (f < 0)
 	{
-		fprintf(stderr, "ftdi_eeprom_decode: %d (%s)\n",
+		BCU_FPRINTF(stderr, "ftdi_eeprom_decode: %d (%s)\n",
 				f, ftdi_get_error_string(ftdic));
 		return -1;
 	}
@@ -967,20 +967,20 @@ int ft_read_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned char
 	ftdi_get_eeprom_value(ftdic, CHIP_SIZE, &value);
 	if (value < 0)
 	{
-		fprintf(stderr, "No EEPROM found or EEPROM empty\n");
-		fprintf(stderr, "On empty EEPROM, use -w option to write default values\n");
+		BCU_FPRINTF(stderr, "No EEPROM found or EEPROM empty\n");
+		BCU_FPRINTF(stderr, "On empty EEPROM, use -w option to write default values\n");
 		return -1;
 	}
 
 	ftdi_eeprom_get_strings(ftdic, NULL, 0, NULL, 0, sn_buf, 7);
 	if (sn_buf[0] == 0)
 	{
-		fprintf(stderr, "Invalid Serial Number\n");
-		fprintf(stderr, "Please use -w option to write default values\n");
+		BCU_FPRINTF(stderr, "Invalid Serial Number\n");
+		BCU_FPRINTF(stderr, "Please use -w option to write default values\n");
 		return -1;
 	}
 
-	// fprintf(stderr, "Chip type %d ftdi_eeprom_size: %d\n", ftdic->type, value);
+	// BCU_FPRINTF(stderr, "Chip type %d ftdi_eeprom_size: %d\n", ftdic->type, value);
 	if (ftdic->type == TYPE_R)
 		eeprom_size = 0xa0;
 	else
