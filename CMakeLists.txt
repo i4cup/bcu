@@ -1,8 +1,7 @@
-PROJECT(bcu)
 cmake_minimum_required(VERSION 3.5)
+project(bcu C CXX)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-#set(CMAKE_BUILD_TYPE Debug)
 
 if (CMAKE_HOST_WIN32)
         set(WINDOWS 1)
@@ -16,20 +15,58 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBFTDI REQUIRED libftdi1)
 pkg_check_modules(LIBYAML REQUIRED yaml-0.1)
 pkg_check_modules(LIBUSB REQUIRED libusb-1.0)
-project(bcu)
-include_directories(${LIBUSB_INCLUDE_DIRS} ${LIBFTDI_INCLUDE_DIRS}include ${PROJECT_SOURCE_DIR}/libftdi/src ${LIBYAML_INCLUDEDIR})
-include_directories(${PROJECT_SOURCE_DIR})
 
-message("operation system is ${CMAKE_SYSTEM}")
+set(BCU_CORE_SOURCES
+        bcu.c
+        port.c
+        chip.c
+        board.c
+        bcu_parser.c
+        bcu_yaml.c
+        bcu_ftdi_eeprom.c
+)
+
+include_directories(
+        ${PROJECT_SOURCE_DIR}
+        ${PROJECT_SOURCE_DIR}/libbcu
+        ${LIBUSB_INCLUDE_DIRS}
+        ${LIBFTDI_INCLUDE_DIRS}
+        ${LIBYAML_INCLUDEDIR}
+)
+link_directories(${LIBUSB_LIBRARY_DIRS} ${LIBFTDI_LIBRARY_DIRS} ${LIBYAML_LIBRARY_DIRS})
+
 if (LINUX)
-        add_executable(bcu bcu.c port.c chip.c board.c bcu_parser.c bcu_yaml.c bcu_ftdi_eeprom.c)
-        link_directories(${LIBUSB_LIBRARY_DIRS} ${LIBFTDI_LIBRARY_DIRS} ${LIBYAML_LIBRARY_DIRS})
-        target_link_libraries (bcu ${LIBUSB_LIBRARIES} ${LIBFTDI_LIBRARIES} ${LIBYAML_LIBRARIES} -lpthread -lm -ldl)
-        execute_process( COMMAND ${PROJECT_SOURCE_DIR}/create_version_h.sh ${PROJECT_SOURCE_DIR} )
+        execute_process(COMMAND ${PROJECT_SOURCE_DIR}/create_version_h.sh ${PROJECT_SOURCE_DIR})
+elseif (MACOS)
+        execute_process(COMMAND sh ${PROJECT_SOURCE_DIR}/create_version_h.sh ${PROJECT_SOURCE_DIR})
+endif ()
+
+add_library(bcu_shared SHARED ${BCU_CORE_SOURCES})
+set_target_properties(bcu_shared PROPERTIES OUTPUT_NAME bcu)
+
+add_library(bcu_static STATIC ${BCU_CORE_SOURCES})
+set_target_properties(bcu_static PROPERTIES OUTPUT_NAME bcu)
+
+if (LINUX)
+        target_link_libraries(bcu_shared ${LIBUSB_LIBRARIES} ${LIBFTDI_LIBRARIES} ${LIBYAML_LIBRARIES} -lpthread -lm -ldl)
+        target_link_libraries(bcu_static ${LIBUSB_LIBRARIES} ${LIBFTDI_LIBRARIES} ${LIBYAML_LIBRARIES} -lpthread -lm -ldl)
+elseif (MACOS)
+        target_link_libraries(bcu_shared ${LIBUSB_LIBDIR}/lib${LIBUSB_LIBRARIES}.dylib ${LIBFTDI_LIBDIR}/${LIBFTDI_MODULE_NAME}.dylib ${LIBYAML_LIBDIR}/lib${LIBYAML_LIBRARIES}.dylib -lpthread -lm)
+        target_link_libraries(bcu_static ${LIBUSB_LIBDIR}/lib${LIBUSB_LIBRARIES}.dylib ${LIBFTDI_LIBDIR}/${LIBFTDI_MODULE_NAME}.dylib ${LIBYAML_LIBDIR}/lib${LIBYAML_LIBRARIES}.dylib -lpthread -lm)
+endif ()
+
+if (LINUX)
+        add_executable(bcu apps/cli/main.c)
+        target_link_libraries(bcu bcu_static)
         install(TARGETS bcu DESTINATION bin)
 elseif (MACOS)
-        add_executable(bcu_mac bcu.c port.c chip.c board.c bcu_parser.c bcu_yaml.c bcu_ftdi_eeprom.c)
-        link_directories(${LIBUSB_LIBRARY_DIRS} ${LIBFTDI_LIBRARY_DIRS} ${LIBYAML_LIBRARY_DIRS})
-        target_link_libraries (bcu_mac ${LIBUSB_LIBDIR}/lib${LIBUSB_LIBRARIES}.dylib ${LIBFTDI_LIBDIR}/${LIBFTDI_MODULE_NAME}.dylib ${LIBYAML_LIBDIR}/lib${LIBYAML_LIBRARIES}.dylib -lpthread -lm)
-        execute_process( COMMAND sh ${PROJECT_SOURCE_DIR}/create_version_h.sh ${PROJECT_SOURCE_DIR} )
+        add_executable(bcu_mac apps/cli/main.c)
+        target_link_libraries(bcu_mac bcu_static)
+        install(TARGETS bcu_mac DESTINATION bin)
 endif ()
+
+install(TARGETS bcu_shared bcu_static
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin)
+install(FILES libbcu/libbcu.h DESTINATION include)

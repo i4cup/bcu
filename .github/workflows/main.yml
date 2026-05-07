@@ -92,14 +92,20 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bcu-artifacts-${{ github.run_id }}-${{ matrix.os }}
-          path: ${{ github.workspace }}/bcu
+          path: |
+            ${{ github.workspace }}/bcu
+            ${{ github.workspace }}/libbcu.so
+            ${{ github.workspace }}/libbcu.a
 
       - name: Upload artifact (macOS)
         if: matrix.os == 'macos-latest'
         uses: actions/upload-artifact@v4
         with:
           name: bcu-artifacts-${{ github.run_id }}-${{ matrix.os }}
-          path: ${{ github.workspace }}/bcu_mac
+          path: |
+            ${{ github.workspace }}/bcu_mac
+            ${{ github.workspace }}/libbcu.dylib
+            ${{ github.workspace }}/libbcu.a
 
       - name: Upload artifact (Windows)
         if: matrix.os == 'windows-latest'
@@ -147,7 +153,11 @@ jobs:
           draft: true
           files: |
             artifacts/ubuntu-latest/bcu
+            artifacts/ubuntu-latest/libbcu.so
+            artifacts/ubuntu-latest/libbcu.a
             artifacts/macos-latest/bcu_mac
+            artifacts/macos-latest/libbcu.dylib
+            artifacts/macos-latest/libbcu.a
             artifacts/windows-latest/bcu.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

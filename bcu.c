@@ -3978,7 +3978,7 @@ void terminateBCU(void)
 	ft4232h_i2c_remove_all(enable_exit_handler);
 }
 
-int main(int argc, char** argv)
+int bcu_main(int argc, char** argv)
 {
 	setbuf(stdin, NULL);
 	setbuf(stdout, NULL);
@@ -4350,4 +4350,3 @@ int main(int argc, char** argv)
 	printf("done\n");
 	return 0;
 }
-

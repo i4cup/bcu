@@ -14,6 +14,19 @@ ________________________________________________________________________________
 ## **For more details about BCU, please check the BCU release note(BCU.pdf) in the latest release page.**
 _______________________________________________________________________________________________________
 
+# **Project structure (libbcu-oriented)**
+
+- `libbcu` (core library interface)
+  - `libbcu/libbcu.h`: exported library entry API
+  - Core implementation sources: `bcu.c`, `port.c`, `chip.c`, `board.c`, `bcu_parser.c`, `bcu_yaml.c`, `bcu_ftdi_eeprom.c`
+- `apps/cli`
+  - `apps/cli/main.c`: CLI wrapper that links against `libbcu`
+
+Release artifacts are organized by system/platform and software form:
+- Linux: `bcu` + `libbcu.so` + `libbcu.a`
+- macOS: `bcu_mac` + `libbcu.dylib` + `libbcu.a`
+- Windows: `bcu.exe`
+
 # **Running environment**
 
  - Windows 10/11, 64bit
@@ -113,4 +126,3 @@ ________________________________________________________________________________
 
 
 _______________________________________________________________________________________________________
-
