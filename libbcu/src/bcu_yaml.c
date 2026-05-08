@@ -385,7 +385,10 @@ int readConf(FILE* fh, const char* config_path, const char* boardname, struct op
 							temp++;
 						}
 						BCU_APP_LOG_INFO("No big change between these two version.\nWill update config file: %s automatically!\n", yamlfile);
-						replace_str((char*)yamlfile, tk, GIT_VERSION);
+						if (config_path != NULL)
+							replace_str((char*)config_path, tk, GIT_VERSION);
+						else
+							BCU_APP_LOG_ERROR("Config file path is required for automatic version updates.\n");
 						strcpy(version, GIT_VERSION);
 					}
 					else

@@ -62,7 +62,17 @@ struct bcu_yaml_version
 	char* version;
 };
 
+/*
+ * The caller owns the file handle and should open it in write mode with the
+ * stream positioned at the beginning of the target config file.
+ */
 int writeConf(FILE* fp);
+
+/*
+ * The caller owns the file handle and should open it in read mode.
+ * config_path should point to the same config file and is used for diagnostics
+ * and automatic in-place config-version updates when needed.
+ */
 int readConf(FILE* fh, const char* config_path, const char* boardname, struct options_setting* setting);
 
 #endif //BCU_YAML_H
