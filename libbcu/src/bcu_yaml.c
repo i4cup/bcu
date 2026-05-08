@@ -194,20 +194,20 @@ int updateRsense(struct board_info* board, char* rail_name, char* rs1, char* rs2
 }
 
 #define FILE_MAX_LENGTH 4096
-int replace_str(char* path, char* source, char* dest)
+int replace_str(FILE* fp, const char* source, const char* dest)
 {
 	char buffer[FILE_MAX_LENGTH];
 	int fp_start = 0;
 	int fp_end = 0;
 	int buffer_length = 0;
 	int move_length = 0;
-	FILE *fp = fopen(path, "r+");
 
 	if(fp == NULL)
 	{
 		BCU_PRINTF("File open failed\n");
 		return 0;
 	}
+	rewind(fp);
 	while (1)
 	{
 		memset(buffer, 0, FILE_MAX_LENGTH);
@@ -251,7 +251,7 @@ int replace_str(char* path, char* source, char* dest)
 		}
 	}
 	BCU_PRINTF("File update successfully!\n");
-	fclose(fp);
+	fflush(fp);
 	return 0;
 }
 
@@ -289,6 +289,8 @@ int readConf(FILE* fh, const char* config_path, const char* boardname, struct op
 	int group_id = 0;
 	char rs1[10], rs2[10];
 	char version[30] = "";
+	char version_to_replace[30] = "";
+	int should_update_version = 0;
 
 	do
 	{
@@ -385,10 +387,8 @@ int readConf(FILE* fh, const char* config_path, const char* boardname, struct op
 							temp++;
 						}
 						BCU_APP_LOG_INFO("No big change between these two version.\nWill update config file: %s automatically!\n", yamlfile);
-						if (config_path != NULL)
-							replace_str((char*)config_path, tk, GIT_VERSION);
-						else
-							BCU_APP_LOG_ERROR("Config file path is required for automatic version updates.\n");
+						strcpy(version_to_replace, tk);
+						should_update_version = 1;
 						strcpy(version, GIT_VERSION);
 					}
 					else
@@ -455,6 +455,12 @@ int readConf(FILE* fh, const char* config_path, const char* boardname, struct op
 
 	yaml_token_delete(&token);
 	yaml_parser_delete(&parser);
+
+	if (should_update_version)
+	{
+		replace_str(fh, version_to_replace, GIT_VERSION);
+		rewind(fh);
+	}
 
 	if (strcmp(version, GIT_VERSION))
 	{

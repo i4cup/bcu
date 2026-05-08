@@ -150,7 +150,7 @@ static int get_yaml_file_path(char* path, size_t path_size)
 
 static int read_config_file(const char* path, const char* board_name, struct options_setting* setting)
 {
-	FILE* config_file = fopen(path, "r");
+	FILE* config_file = fopen(path, "r+");
 	int status;
 
 	if (config_file == NULL)
