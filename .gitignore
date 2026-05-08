@@ -5,6 +5,7 @@ Makefile
 version.h
 CMakeFiles/
 CMakeCache.txt
+build/
 bcu_1.*
 bcu_2.*
 bcu_3.*
