@@ -78,6 +78,7 @@
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/DYAML_DECLARE_STATIC %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)libbcu;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -96,6 +97,7 @@
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/DYAML_DECLARE_STATIC %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)libbcu;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -116,6 +118,7 @@
       <ConformanceMode>true</ConformanceMode>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalOptions>/DYAML_DECLARE_STATIC %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)libbcu;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -141,6 +144,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalOptions>/DYAML_DECLARE_STATIC %(AdditionalOptions)</AdditionalOptions>
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)libbcu;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -154,22 +158,22 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="bcu.c" />
-    <ClCompile Include="bcu_ftdi_eeprom.c" />
-    <ClCompile Include="bcu_parser.c" />
-    <ClCompile Include="bcu_yaml.c" />
-    <ClCompile Include="board.c" />
-    <ClCompile Include="chip.c" />
-    <ClCompile Include="port.c" />
+    <ClCompile Include="apps\cli\bcu.c" />
+    <ClCompile Include="libbcu\src\bcu_ftdi_eeprom.c" />
+    <ClCompile Include="libbcu\src\bcu_parser.c" />
+    <ClCompile Include="libbcu\src\bcu_yaml.c" />
+    <ClCompile Include="libbcu\src\board.c" />
+    <ClCompile Include="libbcu\src\chip.c" />
+    <ClCompile Include="libbcu\src\port.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bcu_ftdi_eeprom.h" />
-    <ClInclude Include="bcu_yaml.h" />
-    <ClInclude Include="board.h" />
-    <ClInclude Include="chip.h" />
-    <ClInclude Include="ftdi_def.h" />
-    <ClInclude Include="bcu_parser.h" />
-    <ClInclude Include="port.h" />
+    <ClInclude Include="include\bcu_ftdi_eeprom.h" />
+    <ClInclude Include="include\bcu_yaml.h" />
+    <ClInclude Include="include\board.h" />
+    <ClInclude Include="include\chip.h" />
+    <ClInclude Include="include\ftdi_def.h" />
+    <ClInclude Include="include\bcu_parser.h" />
+    <ClInclude Include="include\port.h" />
     <ClInclude Include="version.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

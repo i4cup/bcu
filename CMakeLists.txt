@@ -17,16 +17,17 @@ pkg_check_modules(LIBYAML REQUIRED yaml-0.1)
 pkg_check_modules(LIBUSB REQUIRED libusb-1.0)
 
 set(LIBBCU_CORE_SOURCES
-        port.c
-        chip.c
-        board.c
-        bcu_parser.c
-        bcu_yaml.c
-        bcu_ftdi_eeprom.c
+        libbcu/src/port.c
+        libbcu/src/chip.c
+        libbcu/src/board.c
+        libbcu/src/bcu_parser.c
+        libbcu/src/bcu_yaml.c
+        libbcu/src/bcu_ftdi_eeprom.c
 )
 
 include_directories(
         ${PROJECT_SOURCE_DIR}
+        ${PROJECT_SOURCE_DIR}/include
         ${PROJECT_SOURCE_DIR}/libbcu
         ${LIBUSB_INCLUDE_DIRS}
         ${LIBFTDI_INCLUDE_DIRS}
@@ -57,11 +58,11 @@ elseif (MACOS)
 endif ()
 
 if (LINUX)
-        add_executable(bcu bcu.c)
+        add_executable(bcu apps/cli/bcu.c)
         target_link_libraries(bcu bcu_static)
         install(TARGETS bcu DESTINATION bin)
 elseif (MACOS)
-        add_executable(bcu_mac bcu.c)
+        add_executable(bcu_mac apps/cli/bcu.c)
         target_link_libraries(bcu_mac bcu_static)
         install(TARGETS bcu_mac DESTINATION bin)
 endif ()
