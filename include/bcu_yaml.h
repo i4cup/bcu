@@ -31,6 +31,8 @@
 #ifndef BCU_YAML_H
 #define BCU_YAML_H
 
+#include <stdio.h>
+
 #ifdef _WIN32
 #include "libyaml/include/yaml.h"
 #endif
@@ -60,8 +62,7 @@ struct bcu_yaml_version
 	char* version;
 };
 
-void get_yaml_file_path(char* path);
-void writeConf(void);
-int readConf(char* boardname, struct options_setting* setting);
+int writeConf(FILE* fp);
+int readConf(FILE* fh, const char* config_path, const char* boardname, struct options_setting* setting);
 
 #endif //BCU_YAML_H

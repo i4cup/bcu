@@ -79,31 +79,11 @@ struct bcu_yaml_version ver_before_big_ver[] =
 	{NULL}
 };
 
-void get_yaml_file_path(char* path)
+int writeConf(FILE* fp)
 {
-#if defined(linux) || defined(__APPLE__)
-	char * tmpenv;
-	if (( tmpenv = getenv( "HOME" )) != NULL )
-		strcat(path, tmpenv);
-	else
-		BCU_PRINTF("HOME env variable not set.\n");
-	strcat(path, "/bcu_config.yaml");
-#else
-	const char* homeProfile = "USERPROFILE";
-	GetEnvironmentVariable(homeProfile, path, 128);
-	strcat(path, "\\bcu_config.yaml");
-#endif
-}
-
-void writeConf(void)
-{
-	char yamfile[128] = {0};
-	get_yaml_file_path(yamfile);
-
-	FILE *fp = fopen(yamfile, "w+");
 	if (fp == NULL) {
-		BCU_PRINTF("writeConf: Failed to open config file: %s!\n", yamfile);
-		return;
+		BCU_APP_LOG_ERROR("writeConf: invalid config file handle\n");
+		return -1;
 	}
 
 	char text[512];
@@ -189,7 +169,7 @@ void writeConf(void)
 		}
 	}
 
-	fclose(fp);
+	return ferror(fp) ? -1 : 0;
 }
 
 int updateRsense(struct board_info* board, char* rail_name, char* rs1, char* rs2)
@@ -275,14 +255,13 @@ int replace_str(char* path, char* source, char* dest)
 	return 0;
 }
 
-int readConf(char* boardname, struct options_setting* setting)
+int readConf(FILE* fh, const char* config_path, const char* boardname, struct options_setting* setting)
 {
-	char yamfile[128] = {0};
-	get_yaml_file_path(yamfile);
-	FILE* fh = fopen(yamfile, "r");
-	if (fh == NULL)
+	const char* yamlfile = config_path != NULL ? config_path : "<config>";
+
+	if (fh == NULL || boardname == NULL || setting == NULL)
 	{
-		BCU_PRINTF("readConf: Failed to open config file: %s!\n", yamfile);
+		BCU_APP_LOG_ERROR("readConf: invalid parameter\n");
 		return -1;
 	}
 
@@ -291,7 +270,7 @@ int readConf(char* boardname, struct options_setting* setting)
 
 	if (!yaml_parser_initialize(&parser))
 	{
-		BCU_PRINTF("Failed to initialize parser!\n");
+		BCU_APP_LOG_ERROR("Failed to initialize parser!\n");
 		return -2;
 	}
 
@@ -360,7 +339,7 @@ int readConf(char* boardname, struct options_setting* setting)
 							now_board->power_groups = (struct board_power_group*)malloc(sizeof(struct board_power_group) * (MAX_NUMBER_OF_GROUP + 1));
 						if (group_id >= MAX_NUMBER_OF_GROUP)
 						{
-							BCU_PRINTF("%s: Too much group! Please keep the number of groups NOT greater than %d\n", __func__, MAX_NUMBER_OF_GROUP);
+							BCU_APP_LOG_ERROR("%s: Too much group! Please keep the number of groups NOT greater than %d\n", __func__, MAX_NUMBER_OF_GROUP);
 							return -2;
 						}
 						now_status = STATUS_CHANGE_GROUPS;
@@ -385,28 +364,28 @@ int readConf(char* boardname, struct options_setting* setting)
 				{
 					if (compare_version(&GIT_VERSION[4], &tk[4]) != 0)
 					{
-						BCU_PRINTF("\nConfig file version mismatch!\n");
+						BCU_APP_LOG_ERROR("\nConfig file version mismatch!\n");
 						int temp = 0;
 						while (ver_before_big_ver[temp].version)
 						{
 							if (compare_version(ver_before_big_ver[temp].version, &tk[4]) >= 0)
 							{
-								BCU_PRINTF("        BCU version: %s\n", GIT_VERSION);
-								BCU_PRINTF("Config file version: %s\n", tk);
-								BCU_PRINTF("Config file version is too old!\nPlease delete the old config file: %s, then run BCU again!\n", yamfile);
+								BCU_APP_LOG_ERROR("        BCU version: %s\n", GIT_VERSION);
+								BCU_APP_LOG_ERROR("Config file version: %s\n", tk);
+								BCU_APP_LOG_ERROR("Config file version is too old!\nPlease delete the old config file: %s, then run BCU again!\n", yamlfile);
 								return -3;
 							}
 							if (compare_version(ver_before_big_ver[temp].version, &GIT_VERSION[4]) >= 0)
 							{
-								BCU_PRINTF("        BCU version: %s\n", GIT_VERSION);
-								BCU_PRINTF("Config file version: %s\n", tk);
-								BCU_PRINTF("BCU version is too old!\nPlease delete the old config file: %s, then run BCU again!\n", yamfile);
+								BCU_APP_LOG_ERROR("        BCU version: %s\n", GIT_VERSION);
+								BCU_APP_LOG_ERROR("Config file version: %s\n", tk);
+								BCU_APP_LOG_ERROR("BCU version is too old!\nPlease delete the old config file: %s, then run BCU again!\n", yamlfile);
 								return -3;
 							}
 							temp++;
 						}
-						BCU_PRINTF("No big change between these two version.\nWill update config file: %s automatically!\n", yamfile);
-						replace_str(yamfile, tk, GIT_VERSION);
+						BCU_APP_LOG_INFO("No big change between these two version.\nWill update config file: %s automatically!\n", yamlfile);
+						replace_str((char*)yamlfile, tk, GIT_VERSION);
 						strcpy(version, GIT_VERSION);
 					}
 					else
@@ -474,13 +453,11 @@ int readConf(char* boardname, struct options_setting* setting)
 	yaml_token_delete(&token);
 	yaml_parser_delete(&parser);
 
-	fclose(fh);
-
 	if (strcmp(version, GIT_VERSION))
 	{
 		if (compare_version(&GIT_VERSION[4], &version[4]) != 0)
 		{
-			BCU_PRINTF("\nConfig file version is too old!\nPlease delete the old config file: %s, then run BCU again!\n", yamfile);
+			BCU_APP_LOG_ERROR("\nConfig file version is too old!\nPlease delete the old config file: %s, then run BCU again!\n", yamlfile);
 			return -3;
 		}
 	}

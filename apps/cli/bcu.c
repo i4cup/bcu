@@ -114,6 +114,68 @@ static void print_libbcu_log(libbcu_log_level_t level, const char* message, void
 	fputs(message, output);
 }
 
+static int get_yaml_file_path(char* path, size_t path_size)
+{
+	if (path == NULL || path_size == 0)
+		return -1;
+
+#ifdef _WIN32
+	{
+		DWORD profile_length = GetEnvironmentVariableA("USERPROFILE", path, (DWORD)path_size);
+		int suffix_length;
+
+		if (profile_length == 0 || profile_length >= path_size)
+			return -1;
+
+		suffix_length = snprintf(path + profile_length, path_size - profile_length, "\\bcu_config.yaml");
+		if (suffix_length < 0 || (size_t)suffix_length >= path_size - profile_length)
+			return -1;
+	}
+#else
+	{
+		const char* home_directory = getenv("HOME");
+		int written_length;
+
+		if (home_directory == NULL)
+			return -1;
+
+		written_length = snprintf(path, path_size, "%s/bcu_config.yaml", home_directory);
+		if (written_length < 0 || (size_t)written_length >= path_size)
+			return -1;
+	}
+#endif
+
+	return 0;
+}
+
+static int read_config_file(const char* path, const char* board_name, struct options_setting* setting)
+{
+	FILE* config_file = fopen(path, "r");
+	int status;
+
+	if (config_file == NULL)
+		return -1;
+
+	status = readConf(config_file, path, board_name, setting);
+	fclose(config_file);
+
+	return status;
+}
+
+static int write_config_file(const char* path)
+{
+	FILE* config_file = fopen(path, "w+");
+	int status;
+
+	if (config_file == NULL)
+		return -1;
+
+	status = writeConf(config_file);
+	fclose(config_file);
+
+	return status;
+}
+
 void clean_vt_color()
 {
 	g_vt_red = (char*)"";
@@ -4001,7 +4063,11 @@ int main(int argc, char** argv)
 	}
 
 	char yamfile[128] = {0};
-	get_yaml_file_path(yamfile);
+	if (get_yaml_file_path(yamfile, sizeof(yamfile)) != 0)
+	{
+		fprintf(stderr, "Failed to resolve BCU config file path.\n");
+		return -1;
+	}
 
 	switch (argc)
 	{
@@ -4223,14 +4289,18 @@ int main(int argc, char** argv)
 		}
 	}
 
-	switch (readConf(setting.board, &setting))
+	switch (read_config_file(yamfile, setting.board, &setting))
 	{
 	case 0:
 		break;
 	case -1:
 		printf("Trying to create new config file to %s ...\n", yamfile);
-		writeConf();
-		if (readConf(setting.board, &setting) < 0)
+		if (write_config_file(yamfile) < 0)
+		{
+			fprintf(stderr, "Failed to create config file: %s\n", yamfile);
+			return -1;
+		}
+		if (read_config_file(yamfile, setting.board, &setting) < 0)
 			return -1;
 		break;
 	case -2:

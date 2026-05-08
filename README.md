@@ -20,8 +20,9 @@ ________________________________________________________________________________
   - `libbcu/libbcu.h`: exported library status definitions and optional app log callback registration
   - Core implementation sources: `libbcu/src/libbcu_log.c`, `libbcu/src/port.c`, `libbcu/src/chip.c`, `libbcu/src/board.c`, `libbcu/src/bcu_parser.c`, `libbcu/src/bcu_yaml.c`, `libbcu/src/bcu_ftdi_eeprom.c`
   - `libbcu` build targets disable direct printing; selected useful messages can be forwarded to apps through the callback in `libbcu/libbcu.h`
+  - `libbcu/src/bcu_yaml.c` keeps config parsing/serialization logic, while apps own config path resolution and file opening
 - `apps/cli/bcu.c`
-  - terminal app implementation responsible for user-facing output/printing
+  - terminal app implementation responsible for user-facing output/printing and config file access
 
 Release artifacts are organized by system/platform and software form:
 - Linux: `bcu` + `libbcu.so` + `libbcu.a`
