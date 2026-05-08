@@ -2606,9 +2606,9 @@ struct board_info* get_board(char* board_name)
 
 	if (strlen(board_name) == 0)
 	{
-		BCU_PRINTF("\nmissing option <-board=>\n");
-		BCU_PRINTF("\nOr use option <-auto> to find the board automatically\n");
-		BCU_PRINTF("NOTE: if other boards are also connected to the same host, <-auto> may break its ttyUSB function temporarily.\n\n");
+		BCU_APP_LOG_INFO("\nmissing option <-board=>\n");
+		BCU_APP_LOG_INFO("\nOr use option <-auto> to find the board automatically\n");
+		BCU_APP_LOG_INFO("NOTE: if other boards are also connected to the same host, <-auto> may break its ttyUSB function temporarily.\n\n");
 		return NULL;
 	}
 
@@ -2619,7 +2619,7 @@ struct board_info* get_board(char* board_name)
 			return &board_list[i];
 		}
 	}
-	BCU_PRINTF("board model %s is not supported", board_name);
+	BCU_APP_LOG_INFO("board model %s is not supported", board_name);
 
 	strcpy(board_tmp, board_name);
 	for (int j = 0; j < strlen(board_name); j++)
@@ -2632,15 +2632,15 @@ struct board_info* get_board(char* board_name)
 				if (!findflag)
 				{
 					findflag = 1;
-					BCU_PRINTF(", do you mean:\n\n\t");
+					BCU_APP_LOG_INFO(", do you mean:\n\n\t");
 				}
-				BCU_PRINTF("%s ", board_list[i].name);
+				BCU_APP_LOG_INFO("%s ", board_list[i].name);
 			}
 		}
 		if (findflag)
 			break;
 	}
-	BCU_PRINTF("\n");
+	BCU_APP_LOG_INFO("\n");
 
 	return NULL;
 }
@@ -2767,7 +2767,7 @@ int get_boot_mode_offset(unsigned char boot_mode_pin_bitmask)
 	}
 	if (offset > 8)
 	{
-		BCU_PRINTF("get_boot_mode_offset: something is wrong with the pin bitmask %x\n", boot_mode_pin_bitmask);
+		BCU_APP_LOG_INFO("get_boot_mode_offset: something is wrong with the pin bitmask %x\n", boot_mode_pin_bitmask);
 		return -1;
 	}
 	//BCU_PRINTF("offset is %d\n", offset);

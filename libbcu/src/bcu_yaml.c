@@ -178,7 +178,7 @@ int updateRsense(struct board_info* board, char* rail_name, char* rs1, char* rs2
 
 	if (get_path(path, rail_name, board) < 0)
 	{
-		BCU_PRINTF("updateRsense: rail path not found!\n");
+		BCU_APP_LOG_INFO("updateRsense: rail path not found!\n");
 		return -1;
 	}
 
@@ -187,7 +187,7 @@ int updateRsense(struct board_info* board, char* rail_name, char* rs1, char* rs2
 
 	if (set_path(path, rail_name, board) < 0)
 	{
-		BCU_PRINTF("updateRsense: set rail path failed!\n");
+		BCU_APP_LOG_INFO("updateRsense: set rail path failed!\n");
 		return -1;
 	}
 	return 0;
@@ -204,7 +204,7 @@ int replace_str(FILE* fp, const char* source, const char* dest)
 
 	if(fp == NULL)
 	{
-		BCU_PRINTF("File open failed\n");
+		BCU_APP_LOG_INFO("File open failed\n");
 		return 0;
 	}
 	rewind(fp);
@@ -250,7 +250,7 @@ int replace_str(FILE* fp, const char* source, const char* dest)
 			}
 		}
 	}
-	BCU_PRINTF("File update successfully!\n");
+	BCU_APP_LOG_INFO("File update successfully!\n");
 	fflush(fp);
 	return 0;
 }

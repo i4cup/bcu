@@ -58,14 +58,14 @@ int ft_init(struct ftdi_info* ftdi)
 	HINSTANCE hGetProcIDDLL = LoadLibrary("ftd2xx.dll");
 
 	if (!hGetProcIDDLL) {
-		BCU_PRINTF("loading process failed\n");
+		BCU_APP_LOG_INFO("loading process failed\n");
 		return -1;
 	}
 	ftdi->FT_open = (pFT_open)GetProcAddress(hGetProcIDDLL, "FT_Open");
 	ftdi->FT_open_ex = (pFT_open_ex)GetProcAddress(hGetProcIDDLL, "FT_OpenEx");
 
 	if (!ftdi->FT_open) {
-		BCU_PRINTF("ft_init: load failed\n");
+		BCU_APP_LOG_INFO("ft_init: load failed\n");
 		return -1;
 	}
 	ftdi->FT_set_bitmode = (pFT_set_bitmode)GetProcAddress(hGetProcIDDLL, "FT_SetBitMode");
@@ -151,7 +151,7 @@ int ft_open_channel(struct ftdi_info* fi, int channel)
 	else
 	{
 		status = -1;
-		BCU_PRINTF("open channel can only range from 0 to 4\n");
+		BCU_APP_LOG_INFO("open channel can only range from 0 to 4\n");
 
 	}
 	fi->FT_set_timeouts(fi->ftdi, 300, 300);
@@ -189,17 +189,17 @@ int ft_close(struct ftdi_info* fi)
 
 	if (fi->ftdi->usb_dev != NULL)
 		if (libusb_release_interface(fi->ftdi->usb_dev, fi->ftdi->interface) < 0)
-			BCU_PRINTF("release interface failure\n");
+			BCU_APP_LOG_INFO("release interface failure\n");
 
 #ifndef __APPLE__
 	if (fi->ftdi->usb_dev != NULL)
 		if (libusb_attach_kernel_driver(fi->ftdi->usb_dev, fi->ftdi->interface) < 0)
-			BCU_PRINTF("failure attach kernel driver again\n");
+			BCU_APP_LOG_INFO("failure attach kernel driver again\n");
 #endif
 
 	if (fi->ftdi->usb_dev != NULL)
                 if (libusb_kernel_driver_active(fi->ftdi->usb_dev, fi->ftdi->interface) < 0)
-                        BCU_PRINTF("failure active kernel driver again\n");
+                        BCU_APP_LOG_INFO("failure active kernel driver again\n");
 
 	ftdi_usb_close(fi->ftdi);
 	ftdi_free(fi->ftdi);
@@ -251,7 +251,7 @@ int ft_clear_buffer(struct ftdi_info* ftdi)
 #ifdef _WIN32
 	if (ftdi->FT_purge(ftdi->ftdi, PURGE_RX | PURGE_TX))
 	{
-		BCU_PRINTF("clear buffer failed!\n");
+		BCU_APP_LOG_INFO("clear buffer failed!\n");
 	}
 	return 0;
 #else
@@ -261,7 +261,7 @@ int ft_clear_buffer(struct ftdi_info* ftdi)
 	num2 = ftdi_usb_purge_tx_buffer(ftdi->ftdi);
 	if (num1 != 0 || num2 != 0)
 	{
-		BCU_PRINTF("clear buffer failed!\n");
+		BCU_APP_LOG_INFO("clear buffer failed!\n");
 	}
 	return 0;
 #endif
@@ -544,11 +544,11 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 		/*
 		if ((ret = ftdi_usb_get_strings(ftdi, curdev->dev, manufacturer, 128, description, 128, NULL, 0)) < 0)
 		{
-			BCU_FPRINTF(stderr, "ftdi_usb_get_strings failed: %d (%s)\n", ret, ftdi_get_error_string(ftdi));
+			BCU_APP_LOG_ERROR( "ftdi_usb_get_strings failed: %d (%s)\n", ret, ftdi_get_error_string(ftdi));
 			retval = -1;
 			goto done;
 		}
-		BCU_PRINTF("Manufacturer: %s, Description: %s\n\n", manufacturer, description);
+		BCU_APP_LOG_INFO("Manufacturer: %s, Description: %s\n\n", manufacturer, description);
 		*/
 		curdev = curdev->next;
 	}
@@ -841,59 +841,59 @@ int ft_write_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned cha
 	f = ftdi_erase_eeprom(ftdic);
 	if (ftdi_set_eeprom_value(ftdic, MAX_POWER, 100) < 0)
 	{
-		BCU_FPRINTF(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
+		BCU_APP_LOG_INFO( "ftdi_set_eeprom_value: %d (%s)\n",
 			f, ftdi_get_error_string(ftdic));
 	}
 
 	f = ftdi_erase_eeprom(ftdic);/* needed to determine EEPROM chip type */
 	if (ftdi_get_eeprom_value(ftdic, CHIP_TYPE, &value) < 0)
 	{
-		BCU_FPRINTF(stdout, "ftdi_get_eeprom_value: %d (%s)\n",
+		BCU_APP_LOG_INFO( "ftdi_get_eeprom_value: %d (%s)\n",
 			f, ftdi_get_error_string(ftdic));
 	}
 	if (value == -1)
-		BCU_FPRINTF(stdout, "No EEPROM\n");
+		BCU_APP_LOG_INFO( "No EEPROM\n");
 
 	if (ftdi_set_eeprom_value(ftdic, USER_DATA_ADDR, startaddr) < 0)
 	{
-		BCU_FPRINTF(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
+		BCU_APP_LOG_INFO( "ftdi_set_eeprom_value: %d (%s)\n",
 			f, ftdi_get_error_string(ftdic));
 	}
 
 	if (ftdi_set_eeprom_value(ftdic, CHANNEL_A_DRIVER, DRIVER_VCP) < 0)
 	{
-		BCU_FPRINTF(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
+		BCU_APP_LOG_INFO( "ftdi_set_eeprom_value: %d (%s)\n",
 			f, ftdi_get_error_string(ftdic));
 	}
 	
 	if (ftdi_set_eeprom_value(ftdic, CHANNEL_B_DRIVER, DRIVER_VCP) < 0)
 	{
-		BCU_FPRINTF(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
+		BCU_APP_LOG_INFO( "ftdi_set_eeprom_value: %d (%s)\n",
 			f, ftdi_get_error_string(ftdic));
 	}
 
 	if (ftdi_set_eeprom_value(ftdic, CHANNEL_C_DRIVER, DRIVER_VCP) < 0)
 	{
-		BCU_FPRINTF(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
+		BCU_APP_LOG_INFO( "ftdi_set_eeprom_value: %d (%s)\n",
 			f, ftdi_get_error_string(ftdic));
 	}
 
 	if (ftdi_set_eeprom_value(ftdic, CHANNEL_D_DRIVER, DRIVER_VCP) < 0)
 	{
-		BCU_FPRINTF(stdout, "ftdi_set_eeprom_value: %d (%s)\n",
+		BCU_APP_LOG_INFO( "ftdi_set_eeprom_value: %d (%s)\n",
 			f, ftdi_get_error_string(ftdic));
 	}
 
 	if (ftdi_set_eeprom_user_data(ftdic, buffer, size) < 0)
 	{
-		BCU_FPRINTF(stdout, "ftdi_get_eeprom_value: %d (%s)\n",
+		BCU_APP_LOG_INFO( "ftdi_get_eeprom_value: %d (%s)\n",
 			f, ftdi_get_error_string(ftdic));
 	}
 
 	f = ftdi_eeprom_build(ftdic);
 	if (f < 0)
 	{
-		BCU_FPRINTF(stdout, "Erase failed: %s",
+		BCU_APP_LOG_INFO( "Erase failed: %s",
 			ftdi_get_error_string(ftdic));
 		retval = -2;
 		return retval;
@@ -902,7 +902,7 @@ int ft_write_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned cha
 	f = ftdi_write_eeprom(ftdic);
 	if (f < 0)
 	{
-		BCU_FPRINTF(stdout, "ftdi_eeprom_decode: %d (%s)\n",
+		BCU_APP_LOG_INFO( "ftdi_eeprom_decode: %d (%s)\n",
 			f, ftdi_get_error_string(ftdic));
 		retval = 1;
 		return retval;
@@ -951,7 +951,7 @@ int ft_read_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned char
 	f = ftdi_read_eeprom(ftdic);
 	if (f < 0)
 	{
-		BCU_FPRINTF(stderr, "ftdi_read_eeprom: %d (%s)\n",
+		BCU_APP_LOG_ERROR( "ftdi_read_eeprom: %d (%s)\n",
 				f, ftdi_get_error_string(ftdic));
 		return -1;
 	}
@@ -959,7 +959,7 @@ int ft_read_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned char
 	f = ftdi_eeprom_decode(ftdic, 0);
 	if (f < 0)
 	{
-		BCU_FPRINTF(stderr, "ftdi_eeprom_decode: %d (%s)\n",
+		BCU_APP_LOG_ERROR( "ftdi_eeprom_decode: %d (%s)\n",
 				f, ftdi_get_error_string(ftdic));
 		return -1;
 	}
@@ -967,16 +967,16 @@ int ft_read_eeprom(struct ftdi_info* ftdi, unsigned int startaddr, unsigned char
 	ftdi_get_eeprom_value(ftdic, CHIP_SIZE, &value);
 	if (value < 0)
 	{
-		BCU_FPRINTF(stderr, "No EEPROM found or EEPROM empty\n");
-		BCU_FPRINTF(stderr, "On empty EEPROM, use -w option to write default values\n");
+		BCU_APP_LOG_ERROR( "No EEPROM found or EEPROM empty\n");
+		BCU_APP_LOG_ERROR( "On empty EEPROM, use -w option to write default values\n");
 		return -1;
 	}
 
 	ftdi_eeprom_get_strings(ftdic, NULL, 0, NULL, 0, sn_buf, 7);
 	if (sn_buf[0] == 0)
 	{
-		BCU_FPRINTF(stderr, "Invalid Serial Number\n");
-		BCU_FPRINTF(stderr, "Please use -w option to write default values\n");
+		BCU_APP_LOG_ERROR( "Invalid Serial Number\n");
+		BCU_APP_LOG_ERROR( "Please use -w option to write default values\n");
 		return -1;
 	}
 
