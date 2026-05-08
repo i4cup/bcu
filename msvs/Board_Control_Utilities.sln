@@ -7,7 +7,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Board_Control_Utilities", "
 		{D427E552-DB40-4554-B11D-DC360ADC9070} = {D427E552-DB40-4554-B11D-DC360ADC9070}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libyaml", "msvs\libyaml\libyaml.vcxproj", "{D427E552-DB40-4554-B11D-DC360ADC9070}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libyaml", "libyaml\libyaml.vcxproj", "{D427E552-DB40-4554-B11D-DC360ADC9070}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -15,51 +15,51 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="libbcu\src\port.c">
+    <ClCompile Include="..\libbcu\src\port.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="apps\cli\bcu.c">
+    <ClCompile Include="..\apps\cli\bcu.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="libbcu\src\chip.c">
+    <ClCompile Include="..\libbcu\src\chip.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="libbcu\src\board.c">
+    <ClCompile Include="..\libbcu\src\board.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="libbcu\src\bcu_parser.c">
+    <ClCompile Include="..\libbcu\src\bcu_parser.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="libbcu\src\bcu_yaml.c">
+    <ClCompile Include="..\libbcu\src\bcu_yaml.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="libbcu\src\bcu_ftdi_eeprom.c">
+    <ClCompile Include="..\libbcu\src\bcu_ftdi_eeprom.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\port.h">
+    <ClInclude Include="..\include\port.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\board.h">
+    <ClInclude Include="..\include\board.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\chip.h">
+    <ClInclude Include="..\include\chip.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\bcu_parser.h">
+    <ClInclude Include="..\include\bcu_parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ftdi_def.h">
+    <ClInclude Include="..\include\ftdi_def.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="version.h">
+    <ClInclude Include="..\version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\bcu_yaml.h">
+    <ClInclude Include="..\include\bcu_yaml.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\bcu_ftdi_eeprom.h">
+    <ClInclude Include="..\include\bcu_ftdi_eeprom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
