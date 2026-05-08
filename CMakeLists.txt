@@ -17,6 +17,7 @@ pkg_check_modules(LIBYAML REQUIRED yaml-0.1)
 pkg_check_modules(LIBUSB REQUIRED libusb-1.0)
 
 set(LIBBCU_CORE_SOURCES
+        libbcu/src/libbcu_log.c
         libbcu/src/port.c
         libbcu/src/chip.c
         libbcu/src/board.c

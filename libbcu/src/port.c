@@ -387,11 +387,11 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 					board_table[detected_boards][3] = loc_id;
 					detected_boards++;
 				} else
-					BCU_PRINTF("detected channel information are not found!\n");
+					BCU_APP_LOG_ERROR("detected channel information are not found!\n");
 			}
 		}
 		if (mode == LIST_DEVICE_MODE_PRINT)
-			BCU_PRINTF("number of boards connected through FTDI device found: %d\n", detected_boards);
+			BCU_APP_LOG_INFO("number of boards connected through FTDI device found: %d\n", detected_boards);
 		else
 			*board_num = detected_boards;
 
@@ -435,7 +435,7 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 		for (int j = 0; j < detected_boards; j++)
 		{
 			if (mode == LIST_DEVICE_MODE_PRINT)
-				BCU_PRINTF("board[%d] location_id=%s serial_no: %s product Desc: %s\n", j, location_id_str[j],
+				BCU_APP_LOG_INFO("board[%d] location_id=%s serial_no: %s product Desc: %s\n", j, location_id_str[j],
 					board_serial[j][0] == '\0' ? "N/A" : board_serial[j],
 					board_description[j][0] == '\0' ? "N/A" : board_description[j]);
 			else
@@ -458,19 +458,19 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 
 	if ((ftdi = ftdi_new()) == 0)
 	{
-		BCU_FPRINTF(stderr, "ftdi_new failed\n");
+		BCU_APP_LOG_ERROR("ftdi_new failed\n");
 		//return -1;
 	}
 
 	if ((ret = ftdi_usb_find_all(ftdi, &devlist, 0, 0)) < 0)
 	{
-		BCU_FPRINTF(stderr, "ftdi_usb_find_all failed: %d (%s)\n", ret, ftdi_get_error_string(ftdi));
+		BCU_APP_LOG_ERROR("ftdi_usb_find_all failed: %d (%s)\n", ret, ftdi_get_error_string(ftdi));
 		retval = -1;
 		goto do_deinit;
 	}
 
 	if (mode == LIST_DEVICE_MODE_PRINT)
-		BCU_PRINTF("number of boards connected through FTDI device found: %d\n", ret);
+		BCU_APP_LOG_INFO("number of boards connected through FTDI device found: %d\n", ret);
 	else
 		*board_num = ret;
 
@@ -535,7 +535,7 @@ void ft_list_devices(char location_str[][MAX_LOCATION_ID_LENGTH], int *board_num
 		}
 
 		if (mode == LIST_DEVICE_MODE_PRINT)
-			BCU_PRINTF("board[%d] location_id=%s serial_no: %s product Desc: %s\n", i, location_id[i],
+			BCU_APP_LOG_INFO("board[%d] location_id=%s serial_no: %s product Desc: %s\n", i, location_id[i],
 				serial[0] == '\0' ? "N/A" : serial,
 				product[0] == '\0' ? "N/A" : product);
 		else
@@ -596,7 +596,7 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 
 	if (ftStatus != 0)
 	{
-		BCU_PRINTF("failed to obtain device info list\n");
+		BCU_APP_LOG_ERROR("failed to obtain device info list\n");
 	}
 	if (numDevs > 0)
 	{
@@ -605,7 +605,7 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 			ftStatus = ft.FT_get_device_info_detail(i, &Flags, &Type, &ID, &loc_id, SerialNumber, Description, &ftHandleTemp);
 			if (ftStatus != 0)
 			{
-				BCU_PRINTF("fail to get device information\n");
+				BCU_APP_LOG_ERROR("fail to get device information\n");
 				return -1;
 			}
 			int found = 0;
@@ -625,7 +625,7 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 					else if (strcmp("D", &Description[strlen(Description) - 1]) == 0)
 						board_table[k][3] = loc_id;
 					else
-						BCU_PRINTF("detected channel information are not found!\n");
+						BCU_APP_LOG_ERROR("detected channel information are not found!\n");
 				}
 			}
 			if (!found)
@@ -647,7 +647,7 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 					board_table[detected_boards][3] = loc_id;
 				else
 				{
-					BCU_PRINTF("detected channel information are not found!\n");
+					BCU_APP_LOG_ERROR("detected channel information are not found!\n");
 					continue;
 				}
 				detected_boards++;
@@ -688,7 +688,7 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 			else
 			{
 				status = -1;
-				BCU_PRINTF("open channel can only range from 0 to 4\n");
+				BCU_APP_LOG_ERROR("open channel can only range from 0 to 4\n");
 			}
 
 			//status = fi->FT_open_ex(0x192, OPEN_BY_LOCATION, &fi->ftdi);
@@ -698,7 +698,7 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 		}
 	}
 
-	BCU_PRINTF("entered location id can not be found\n");
+	BCU_APP_LOG_ERROR("entered location id can not be found\n");
 	return -1;
 
 #else
@@ -709,19 +709,19 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 	struct ftdi_device_list* devlist, * curdev;
 	if (fi->ftdi == NULL)
 	{
-		BCU_PRINTF("ftdi_new failed!\n");
+		BCU_APP_LOG_ERROR("ftdi_new failed!\n");
 		return -1;
 	}
 
 	if ((number_of_ftdi = ftdi_usb_find_all(fi->ftdi, &devlist, 0, 0)) < 0)
 	{
-		BCU_PRINTF("ftdi_usb_find_all failed!\n");
+		BCU_APP_LOG_ERROR("ftdi_usb_find_all failed!\n");
 		return -1;
 	}
 
 	if (number_of_ftdi == 0)
 	{
-		BCU_PRINTF("no ftdi device found! please make sure the device is connnected to the computer\n");
+		BCU_APP_LOG_ERROR("no ftdi device found! please make sure the device is connnected to the computer\n");
 		ftdi_free(fi->ftdi);
 		ftdi_list_free(&devlist);
 		return -1;
@@ -770,7 +770,7 @@ int ft_open_channel_by_id(struct ftdi_info* fi, int channel, char* id)
 	ftdi_list_free(&devlist);
 
 	if (!found) {
-		BCU_PRINTF("entered location id not found\n");
+		BCU_APP_LOG_ERROR("entered location id not found\n");
 		ftdi_free(fi->ftdi);
 
 		return -1;

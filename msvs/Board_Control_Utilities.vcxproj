@@ -160,6 +160,7 @@
   <ItemGroup>
     <ClCompile Include="..\apps\cli\bcu.c" />
     <ClCompile Include="..\libbcu\src\bcu_ftdi_eeprom.c" />
+    <ClCompile Include="..\libbcu\src\libbcu_log.c" />
     <ClCompile Include="..\libbcu\src\bcu_parser.c" />
     <ClCompile Include="..\libbcu\src\bcu_yaml.c" />
     <ClCompile Include="..\libbcu\src\board.c" />

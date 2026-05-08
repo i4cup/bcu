@@ -21,6 +21,9 @@
     <ClCompile Include="..\apps\cli\bcu.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\libbcu\src\libbcu_log.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\libbcu\src\chip.c">
       <Filter>Source Files</Filter>
     </ClCompile>

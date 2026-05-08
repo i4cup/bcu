@@ -53,6 +53,7 @@
 #include <ctype.h>
 #include <math.h>
 
+#include "libbcu/libbcu.h"
 #include "port.h"
 #include "bcu_parser.h"
 #include "chip.h"
@@ -104,6 +105,14 @@ char* g_vt_clear_remain = (char*)"\x1B[0J";
 char* g_vt_clear_line = (char*)"\x1B[K";
 char* g_vt_return_last_line = (char*)"\x1B[1A";
 char* g_vt_home = (char*)"\x1B[H";
+
+static void print_libbcu_log(libbcu_log_level_t level, const char* message, void* user_data)
+{
+	FILE* output = level == LIBBCU_LOG_ERROR ? stderr : stdout;
+
+	(void)user_data;
+	fputs(message, output);
+}
 
 void clean_vt_color()
 {
@@ -3982,6 +3991,7 @@ int main(int argc, char** argv)
 {
 	setbuf(stdin, NULL);
 	setbuf(stdout, NULL);
+	libbcu_set_log_callback(print_libbcu_log, NULL);
 
 	print_version();
 

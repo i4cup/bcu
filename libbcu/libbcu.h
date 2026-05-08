@@ -15,6 +15,15 @@ typedef enum {
 	LIBBCU_ERR_UNSUPPORTED = -6,
 } libbcu_status_t;
 
+typedef enum {
+	LIBBCU_LOG_INFO = 0,
+	LIBBCU_LOG_ERROR = 1,
+} libbcu_log_level_t;
+
+typedef void (*libbcu_log_callback_t)(libbcu_log_level_t level, const char* message, void* user_data);
+
+void libbcu_set_log_callback(libbcu_log_callback_t callback, void* user_data);
+
 #ifdef __cplusplus
 }
 #endif

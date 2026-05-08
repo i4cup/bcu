@@ -17,9 +17,9 @@ ________________________________________________________________________________
 # **Project structure (libbcu-oriented)**
 
 - `libbcu` (core library interface)
-  - `libbcu/libbcu.h`: exported library status definitions
-  - Core implementation sources: `libbcu/src/port.c`, `libbcu/src/chip.c`, `libbcu/src/board.c`, `libbcu/src/bcu_parser.c`, `libbcu/src/bcu_yaml.c`, `libbcu/src/bcu_ftdi_eeprom.c`
-  - `libbcu` build targets disable direct printing; status-code propagation is provided as interface direction via `libbcu/libbcu.h`
+  - `libbcu/libbcu.h`: exported library status definitions and optional app log callback registration
+  - Core implementation sources: `libbcu/src/libbcu_log.c`, `libbcu/src/port.c`, `libbcu/src/chip.c`, `libbcu/src/board.c`, `libbcu/src/bcu_parser.c`, `libbcu/src/bcu_yaml.c`, `libbcu/src/bcu_ftdi_eeprom.c`
+  - `libbcu` build targets disable direct printing; selected useful messages can be forwarded to apps through the callback in `libbcu/libbcu.h`
 - `apps/cli/bcu.c`
   - terminal app implementation responsible for user-facing output/printing
 
